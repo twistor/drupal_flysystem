@@ -1,0 +1,7 @@
+name: Flysystem
+description: 'Provides access to various filesystem backends using Flysystem.'
+type: module
+core: 8.x
+version: 8.0-dev
+dependencies:
+ - composer_manager
