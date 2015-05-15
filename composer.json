@@ -1,0 +1,6 @@
+{
+  "name": "drupal/flysystem",
+  "require": {
+    "league/flysystem": "~1.0"
+  }
+}
