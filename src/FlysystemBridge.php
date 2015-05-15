@@ -224,8 +224,7 @@ class FlysystemBridge implements StreamWrapperInterface {
     $this->uri = $uri;
     // @todo mode handling.
     // $recursive = (bool) ($options & STREAM_MKDIR_RECURSIVE);
-    $success = $this->getFilesystem()->createDir($this->getTarget());
-    return $success;
+    return $this->getFilesystem()->createDir($this->getTarget());
   }
 
   /**
@@ -275,7 +274,6 @@ class FlysystemBridge implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function stream_close() {
-    $this->getFilesystem()->putStream($this->getTarget(), $this->handle);
     fclose($this->handle);
   }
 
