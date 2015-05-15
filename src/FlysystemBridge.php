@@ -238,7 +238,9 @@ class FlysystemBridge implements StreamWrapperInterface {
     try {
       return $filesystem->rename($path_from, $path_to);
     }
-    catch (FileNotFoundException $e) {}
+    catch (FileNotFoundException $e) {
+      trigger_error(sprintf('%s(%s,%s): No such file or directory', __FUNCTION__, $path_from, $path_to), E_USER_WARNING);
+    }
 
     // PHP's rename() will overwrite an existing file. Emulate that.
     catch (FileExistsException $e) {
@@ -258,7 +260,9 @@ class FlysystemBridge implements StreamWrapperInterface {
     try {
       return $this->getFilesystem()->deleteDir($this->getTarget());
     }
-    catch (RootViolationException $e) {}
+    catch (RootViolationException $e) {
+      trigger_error(sprintf('%s(%s): Cannot remove the root directory', __FUNCTION__, $this->getTarget()), E_USER_WARNING);
+    }
 
     return FALSE;
   }
@@ -416,7 +420,7 @@ class FlysystemBridge implements StreamWrapperInterface {
    */
   public function unlink($uri) {
     $this->uri = $uri;
-    $this->doUnlink($this->getTarget());
+    return $this->doUnlink($this->getTarget());
   }
 
   /**
@@ -432,7 +436,9 @@ class FlysystemBridge implements StreamWrapperInterface {
     try {
       return $this->getFilesystem()->delete($path);
     }
-    catch (FileNotFoundException $e) {}
+    catch (FileNotFoundException $e) {
+      trigger_error(sprintf('%s(%s): No such file or directory', __FUNCTION__, $path), E_USER_WARNING);
+    }
 
     return FALSE;
   }
