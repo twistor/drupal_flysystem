@@ -1,9 +1,4 @@
 services:
-  stream_wrapper.zip:
-    class: Drupal\flysystem\FlysystemBridge
-    tags:
-      - { name: flysystem_stream_wrapper, scheme: zip }
-
   path_processor.flysystem:
     class: Drupal\flysystem\PathProcessor\PathProcessorImageStyles
     tags:

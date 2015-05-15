@@ -10,9 +10,9 @@ namespace Drupal\flysystem;
 use Drupal\Core\Routing\UrlGeneratorTrait;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
+use League\Flysystem\Adapter\NullAdapter;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
-use League\Flysystem\ZipArchive\ZipArchiveAdapter;
 
 /**
  * An adapter for Flysystem to StreamWrapperInterface.
@@ -28,6 +28,20 @@ class FlysystemBridge implements StreamWrapperInterface {
   protected static $lockOptions = [LOCK_SH, LOCK_EX, LOCK_UN, LOCK_NB];
 
   /**
+   * A map from adapter type to adapter factory.
+   *
+   * @var array
+   *
+   * @todo  Figure out a way for other modules to register adapters.
+   */
+  protected static $adapterMap = [
+    'zip' => 'Drupal\flysystem\AdapterFactory\Zip',
+    'sftp' => 'Drupal\flysystem\AdapterFactory\Sftp',
+    'local' => 'Drupal\flysystem\AdapterFactory\Local',
+    's3' => 'Drupal\flysystem\AdapterFactory\S3',
+  ];
+
+  /**
    * {@inheritdoc}
    */
   public static function getType() {
@@ -38,20 +52,26 @@ class FlysystemBridge implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function getName() {
-    return t('Flysystem: FTP');
+    return t('Flysystem: @scheme', ['@scheme' => $this->getScheme()]);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDescription() {
-    return t('FTP filesystem provided by Flysystem.');
+    return t('Flysystem: @scheme', ['@scheme' => $this->getScheme()]);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getUri() {
     return $this->uri;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUri($uri) {
     $this->uri = $uri;
   }
@@ -70,6 +90,14 @@ class FlysystemBridge implements StreamWrapperInterface {
    */
   public function realpath() {
     return FALSE;
+  }
+
+  protected function getScheme($uri = NULL) {
+    if (!isset($uri)) {
+      $uri = $this->uri;
+    }
+
+    return substr($uri, 0, strpos($uri, '://'));
   }
 
   /**
@@ -108,7 +136,7 @@ class FlysystemBridge implements StreamWrapperInterface {
     // If there's no scheme, assume a regular directory path.
     if (!isset($target)) {
       $target = $scheme;
-      $scheme = FALSE;
+      $scheme = NULL;
     }
 
     $dirname = ltrim(dirname($target), '\/');
@@ -117,7 +145,7 @@ class FlysystemBridge implements StreamWrapperInterface {
       $dirname = '';
     }
 
-    return $scheme ? $scheme . '://' . $dirname : $dirname;
+    return isset($scheme) ? $scheme . '://' . $dirname : $dirname;
   }
 
   /**
@@ -230,7 +258,6 @@ class FlysystemBridge implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function stream_metadata($uri, $option, $value) {
-    return TRUE;
     $this->uri = $uri;
     // $path = $this->getTarget();
 
@@ -385,16 +412,26 @@ class FlysystemBridge implements StreamWrapperInterface {
     return array_merge(array_values($ret), $ret);
   }
 
-  protected function getFilesystem() {
-    if (isset($this->filesystem)) {
-      return $this->filesystem;
+  protected function getNewAdapter() {
+    $schemes = Settings::get('flysystem', []);
+    $scheme = $this->getScheme();
+
+    $type = isset($schemes[$scheme]['type']) ? $schemes[$scheme]['type'] : '';
+    $config = isset($schemes[$scheme]['config']) ? $schemes[$scheme]['config'] : [];
+
+    if (isset(static::$adapterMap[$type])) {
+      $factory = static::$adapterMap[$type];
+      return $factory::create($config);
     }
 
-    $base_path = Settings::get('file_public_path', conf_path() . '/files');
+    return new NullAdapter();
+  }
 
-    $adapter = new ZipArchiveAdapter($base_path . '/flysystem_test.zip');
+  protected function getFilesystem() {
+    if (!isset($this->filesystem)) {
+      $this->filesystem = new Filesystem($this->getNewAdapter());
+    }
 
-    $this->filesystem = new Filesystem($adapter);
     return $this->filesystem;
   }
 

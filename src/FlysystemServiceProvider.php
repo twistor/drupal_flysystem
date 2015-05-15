@@ -9,7 +9,7 @@ namespace Drupal\flysystem;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
-use Drupal\flysystem\RegisterStreamWrappersPass;
+use Drupal\Core\Site\Settings;
 
 /**
  * Flysystem dependency injection container.
@@ -20,8 +20,11 @@ class FlysystemServiceProvider implements ServiceProviderInterface {
    * {@inheritdoc}
    */
   public function register(ContainerBuilder $container) {
-    // Add a compiler pass for adding stream wrappers.
-    $container->addCompilerPass(new RegisterStreamWrappersPass());
+    foreach (Settings::get('flysystem', []) as $scheme => $settings) {
+      $container
+        ->register('flysystem_stream_wrapper.' . $scheme, 'Drupal\flysystem\FlysystemBridge')
+        ->addTag('stream_wrapper', ['scheme' => $scheme]);
+    }
   }
 
 }
