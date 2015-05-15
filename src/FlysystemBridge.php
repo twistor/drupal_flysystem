@@ -231,12 +231,22 @@ class FlysystemBridge implements StreamWrapperInterface {
   /**
    * {@inheritdoc}
    */
-  public function rename($path_from, $path_to) {
+  public function rename($uri_from, $uri_to) {
+    $filesystem = $this->getFilesystem();
+    $path_from = $this->getTarget($uri_from);
+    $path_to = $this->getTarget($uri_to);
+
     try {
-      return $this->getFilesystem()->rename($this->getTarget($path_from), $this->getTarget($path_to));
+      return $filesystem->rename($path_from, $path_to);
     }
     catch (FileNotFoundException $e) {}
-    catch (FileExistsException $e) {}
+
+    // PHP's rename() will overwrite an existing file. Emulate that.
+    catch (FileExistsException $e) {
+      if ($this->doUnlink($path_to)) {
+        return $filesystem->rename($path_from, $path_to);
+      }
+    }
 
     return FALSE;
   }
@@ -408,8 +418,21 @@ class FlysystemBridge implements StreamWrapperInterface {
    */
   public function unlink($uri) {
     $this->uri = $uri;
+    $this->doUnlink($this->getTarget());
+  }
+
+  /**
+   * Performs the actual deletion of a file.
+   *
+   * @param string $path
+   *   An internal path.
+   *
+   * @return bool
+   *   True on success, false on failure.
+   */
+  protected function doUnlink($path) {
     try {
-      return $this->getFilesystem()->delete($this->getTarget());
+      return $this->getFilesystem()->delete($path);
     }
     catch (FileNotFoundException $e) {}
 
