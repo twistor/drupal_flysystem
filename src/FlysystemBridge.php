@@ -11,8 +11,11 @@ use Drupal\Core\Routing\UrlGeneratorTrait;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use League\Flysystem\Adapter\NullAdapter;
+use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemInterface;
+use League\Flysystem\RootViolationException;
 
 /**
  * An adapter for Flysystem to StreamWrapperInterface.
@@ -20,12 +23,6 @@ use League\Flysystem\Filesystem;
 class FlysystemBridge implements StreamWrapperInterface {
 
   use UrlGeneratorTrait;
-
-  protected $uri;
-
-  protected $listing;
-
-  protected static $lockOptions = [LOCK_SH, LOCK_EX, LOCK_UN, LOCK_NB];
 
   /**
    * A map from adapter type to adapter factory.
@@ -40,6 +37,36 @@ class FlysystemBridge implements StreamWrapperInterface {
     'local' => 'Drupal\flysystem\AdapterFactory\Local',
     's3' => 'Drupal\flysystem\AdapterFactory\S3',
   ];
+
+  /**
+   * Valid lock options.
+   *
+   * @var int[]
+   */
+  protected static $lockOptions = [LOCK_SH, LOCK_EX, LOCK_UN, LOCK_NB];
+
+  /**
+   * A generic resource handle.
+   *
+   * @var resource
+   */
+  protected $handle;
+
+  /**
+   * A directory listing.
+   *
+   * @var array
+   */
+  protected $listing;
+
+  /**
+   * Instance URI (stream).
+   *
+   * A stream is referenced as "scheme://target".
+   *
+   * @var string
+   */
+  protected $uri;
 
   /**
    * {@inheritdoc}
@@ -92,6 +119,15 @@ class FlysystemBridge implements StreamWrapperInterface {
     return FALSE;
   }
 
+  /**
+   * Returns the scheme from a URI.
+   *
+   * @param string $uri
+   *  (optional) The URI to find the scheme for.
+   *
+   * @return string
+   *   The scheme.
+   */
   protected function getScheme($uri = NULL) {
     if (!isset($uri)) {
       $uri = $this->uri;
@@ -196,7 +232,13 @@ class FlysystemBridge implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function rename($path_from, $path_to) {
-    return $this->getFilesystem()->rename($this->getTarget($path_from), $this->getTarget($path_to));
+    try {
+      return $this->getFilesystem()->rename($this->getTarget($path_from), $this->getTarget($path_to));
+    }
+    catch (FileNotFoundException $e) {}
+    catch (FileExistsException $e) {}
+
+    return FALSE;
   }
 
   /**
@@ -204,7 +246,12 @@ class FlysystemBridge implements StreamWrapperInterface {
    */
   public function rmdir($uri, $options) {
     $this->uri = $uri;
-    return $this->getFilesystem()->deleteDir($this->getTarget());
+    try {
+      return $this->getFilesystem()->deleteDir($this->getTarget());
+    }
+    catch (RootViolationException $e) {}
+
+    return FALSE;
   }
 
   /**
@@ -281,14 +328,15 @@ class FlysystemBridge implements StreamWrapperInterface {
     try {
       $reader = $this->getFilesystem()->readStream($path);
 
-      // Some adapters are read only streams, so we can't depend on writing to
-      // them.
-      stream_copy_to_stream($reader, $this->handle);
-      fclose($reader);
-      rewind($this->handle);
+      if ($reader) {
+        // Some adapters are read only streams, so we can't depend on writing to
+        // them.
+        stream_copy_to_stream($reader, $this->handle);
+        fclose($reader);
+        rewind($this->handle);
+      }
     }
-    catch (FileNotFoundException $e) {
-    }
+    catch (FileNotFoundException $e) {}
 
     if ((bool) $this->handle && $options & STREAM_USE_PATH) {
       $opened_path = $path;
@@ -360,7 +408,12 @@ class FlysystemBridge implements StreamWrapperInterface {
    */
   public function unlink($uri) {
     $this->uri = $uri;
-    $this->getFilesystem()->delete($this->getTarget());
+    try {
+      return $this->getFilesystem()->delete($this->getTarget());
+    }
+    catch (FileNotFoundException $e) {}
+
+    return FALSE;
   }
 
   /**
@@ -392,6 +445,12 @@ class FlysystemBridge implements StreamWrapperInterface {
       return FALSE;
     }
 
+    // It's possible for getMetadata() to fail even if a file exists.
+    // @todo Figure out the correct way to handle this.
+    if ($metadata === FALSE) {
+      return $ret;
+    }
+
     if ($metadata['type'] === 'dir') {
       // Mode 0777.
       $ret['mode'] = 16895;
@@ -412,6 +471,12 @@ class FlysystemBridge implements StreamWrapperInterface {
     return array_merge(array_values($ret), $ret);
   }
 
+  /**
+   * Returns the adapter for the current scheme.
+   *
+   * @return \League\Flysystem\AdapterInterface
+   *   The correct adapter from settings.
+   */
   protected function getNewAdapter() {
     $schemes = Settings::get('flysystem', []);
     $scheme = $this->getScheme();
@@ -427,12 +492,30 @@ class FlysystemBridge implements StreamWrapperInterface {
     return new NullAdapter();
   }
 
+  /**
+   * Returns the filesystem.
+   *
+   * @return \League\Flysystem\FilesystemInterface
+   *   The filesystem object.
+   */
   protected function getFilesystem() {
     if (!isset($this->filesystem)) {
       $this->filesystem = new Filesystem($this->getNewAdapter());
     }
 
     return $this->filesystem;
+  }
+
+  /**
+   * Sets the filesystem.
+   *
+   * @param \League\Flysystem\FilesystemInterface $filesystem
+   *   The filesystem.
+   *
+   * @internal Only used during tests.
+   */
+  public function setFileSystem(FilesystemInterface $filesystem) {
+    $this->filesystem = $filesystem;
   }
 
 }
