@@ -125,7 +125,6 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
       'config' => [],
       'replicate' => FALSE,
       'cache' => FALSE,
-      'prefix' => FALSE,
     ];
   }
 
