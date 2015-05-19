@@ -11,6 +11,7 @@ use Drupal\Core\Routing\UrlGeneratorTrait;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use League\Flysystem\Adapter\NullAdapter;
+use League\Flysystem\Cached\CachedAdapter;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
 use Twistor\FlysystemStreamWrapper;
@@ -139,11 +140,17 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    * {@inheritdoc}
    */
   protected function getFilesystem() {
-    if (!isset($this->filesystem)) {
-      $this->filesystem = new Filesystem($this->getNewAdapter());
+    $scheme = $this->getProtocol();
+
+    if (isset(static::$filesystems[$scheme])) {
+      return static::$filesystems[$scheme];
     }
 
-    return $this->filesystem;
+    $store = \Drupal::service('flysystem_cache');
+    $adapter = new CachedAdapter($this->getNewAdapter(), $store);
+    static::$filesystems[$scheme] = new Filesystem($adapter);
+
+    return static::$filesystems[$scheme];
   }
 
   /**

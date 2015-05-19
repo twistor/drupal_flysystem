@@ -1,4 +1,8 @@
 services:
+  flysystem_cache:
+    class: Drupal\flysystem\DrupalFlysystemCache
+    arguments: ['@cache.default', 'flysystem_files']
+
   path_processor.flysystem:
     class: Drupal\flysystem\PathProcessor\PathProcessorImageStyles
     tags:
