@@ -22,11 +22,7 @@ class Sftp implements AdapterFactoryInterface {
    * {@inheritdoc}
    */
   public static function create(array $config) {
-    $config += ['prefix' => ''];
-    $adapter = new SftpAdapter($config);
-    $adapter->setPathPrefix($config['prefix']);
-
-    return $adapter;
+    return new SftpAdapter($config);
   }
 
 }

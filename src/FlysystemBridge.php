@@ -7,6 +7,7 @@
 
 namespace Drupal\flysystem;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Routing\UrlGeneratorTrait;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
@@ -14,6 +15,7 @@ use League\Flysystem\Adapter\NullAdapter;
 use League\Flysystem\Cached\CachedAdapter;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
+use League\Flysystem\Replicate\ReplicateAdapter;
 use Twistor\FlysystemStreamWrapper;
 
 /**
@@ -79,8 +81,14 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    * {@inheritdoc}
    */
   public function getExternalUrl() {
-    list($scheme, $path) = explode('://', $this->uri, 2);
-    $path = str_replace('\\', '/', $path);
+    $scheme = $this->getProtocol();
+    $path = str_replace('\\', '/', $this->getTarget());
+
+    $settings = $this->getSettingsForScheme($scheme);
+    if ($settings['prefix']) {
+      return $settings['prefix'] . UrlHelper::encodePath($path);
+    }
+
     return $this->url('flysystem.download', ['scheme' => $scheme, 'path' => $path], ['absolute' => TRUE]);
   }
 
@@ -116,24 +124,59 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
   }
 
   /**
+   * Finds the settings for a given scheme.
+   *
+   * @param string $scheme
+   *   The scheme.
+   *
+   * @return array
+   *   The settings array from settings.php.
+   */
+  protected function getSettingsForScheme($scheme) {
+    $schemes = Settings::get('flysystem', []);
+
+    $settings = isset($schemes[$scheme]) ? $schemes[$scheme] : [];
+
+    return $settings += [
+      'type' => '',
+      'config' => [],
+      'replicate' => FALSE,
+      'cache' => FALSE,
+      'prefix' => FALSE,
+    ];
+  }
+
+  /**
    * Returns the adapter for the current scheme.
+   *
+   * @param string $scheme
+   *   The scheme to find an adapter for.
    *
    * @return \League\Flysystem\AdapterInterface
    *   The correct adapter from settings.
    */
-  protected function getNewAdapter() {
-    $schemes = Settings::get('flysystem', []);
-    $scheme = $this->getProtocol();
+  protected function getNewAdapter($scheme) {
+    $settings = $this->getSettingsForScheme($scheme);
 
-    $type = isset($schemes[$scheme]['type']) ? $schemes[$scheme]['type'] : '';
-    $config = isset($schemes[$scheme]['config']) ? $schemes[$scheme]['config'] : [];
-
-    if (isset(static::$adapterMap[$type])) {
-      $factory = static::$adapterMap[$type];
-      return $factory::create($config);
+    if (isset(static::$adapterMap[$settings['type']])) {
+      $factory = static::$adapterMap[$settings['type']];
+      $adapter = $factory::create($settings['config']);
+    }
+    else {
+      $adapter = new NullAdapter();
     }
 
-    return new NullAdapter();
+    if ($settings['replicate']) {
+      $replica = $this->getNewAdapter($settings['replicate']);
+      $adapter = new ReplicateAdapter($adapter, $replica);
+    }
+
+    if ($settings['cache']) {
+      $store = \Drupal::service('flysystem_cache');
+      $adapter = new CachedAdapter($adapter, $store);
+    }
+
+    return $adapter;
   }
 
   /**
@@ -146,12 +189,8 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
 
     $scheme = $this->getProtocol();
 
-    // We need these two levels of cache to be able to support setFileSystem().
-    // @todo Fix this. It's ugly.
     if (!isset(static::$filesystems[$scheme])) {
-      $store = \Drupal::service('flysystem_cache');
-      $adapter = new CachedAdapter($this->getNewAdapter(), $store);
-      static::$filesystems[$scheme] = new Filesystem($adapter);
+      static::$filesystems[$scheme] = new Filesystem($this->getNewAdapter($scheme));
     }
 
     $this->filesystem = static::$filesystems[$scheme];

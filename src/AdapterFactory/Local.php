@@ -7,7 +7,7 @@
 
 namespace Drupal\flysystem\AdapterFactory;
 
-use League\Flysystem\Adapter\Local;
+use League\Flysystem\Adapter\Local as LocalAdapter;
 
 class Local implements AdapterFactoryInterface {
 
@@ -22,11 +22,7 @@ class Local implements AdapterFactoryInterface {
    * {@inheritdoc}
    */
   public static function create(array $config) {
-    $config += ['prefix' => ''];
-    $adapter = new Local($config['root']);
-    $adapter->setPathPrefix($config['prefix']);
-
-    return $adapter;
+    return new LocalAdapter($config['root']);
   }
 
 }

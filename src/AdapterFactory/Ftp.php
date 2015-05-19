@@ -22,11 +22,7 @@ class Ftp implements AdapterFactoryInterface {
    * {@inheritdoc}
    */
   public static function create(array $config) {
-    $config += ['prefix' => ''];
-    $adapter = new FtpAdapter($config);
-    $adapter->setPathPrefix($config['prefix']);
-
-    return $adapter;
+    return new FtpAdapter($config);
   }
 
 }
