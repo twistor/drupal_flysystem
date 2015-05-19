@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\flysystem\AdapterFactory\S3.
+ * Contains \Drupal\flysystem\AdapterFactory\S3v2.
  */
 
 namespace Drupal\flysystem\AdapterFactory;
@@ -10,7 +10,7 @@ namespace Drupal\flysystem\AdapterFactory;
 use Aws\S3\S3Client;
 use League\Flysystem\AwsS3v2\AwsS3Adapter;
 
-class S3 implements AdapterFactoryInterface {
+class S3v2 implements AdapterFactoryInterface {
 
   /**
    * {@inheritdoc}

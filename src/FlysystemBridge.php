@@ -11,6 +11,7 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Routing\UrlGeneratorTrait;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
+use League\Flysystem\Adapter\Local;
 use League\Flysystem\Adapter\NullAdapter;
 use League\Flysystem\Cached\CachedAdapter;
 use League\Flysystem\Filesystem;
@@ -37,7 +38,7 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
     'ftp' => 'Drupal\flysystem\AdapterFactory\Ftp',
     'local' => 'Drupal\flysystem\AdapterFactory\Local',
     'rackspace' => 'Drupal\flysystem\AdapterFactory\Rackspace',
-    's3' => 'Drupal\flysystem\AdapterFactory\S3',
+    's3v2' => 'Drupal\flysystem\AdapterFactory\S3v2',
     'sftp' => 'Drupal\flysystem\AdapterFactory\Sftp',
     'zip' => 'Drupal\flysystem\AdapterFactory\Zip',
   ];
@@ -132,7 +133,7 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    * @return array
    *   The settings array from settings.php.
    */
-  protected function getSettingsForScheme($scheme) {
+  protected static function getSettingsForScheme($scheme) {
     $schemes = Settings::get('flysystem', []);
 
     $settings = isset($schemes[$scheme]) ? $schemes[$scheme] : [];
@@ -155,7 +156,7 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    * @return \League\Flysystem\AdapterInterface
    *   The correct adapter from settings.
    */
-  protected function getNewAdapter($scheme) {
+  protected static function getNewAdapter($scheme) {
     $settings = $this->getSettingsForScheme($scheme);
 
     if (isset(static::$adapterMap[$settings['type']])) {
@@ -167,7 +168,7 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
     }
 
     if ($settings['replicate']) {
-      $replica = $this->getNewAdapter($settings['replicate']);
+      $replica = static::getNewAdapter($settings['replicate']);
       $adapter = new ReplicateAdapter($adapter, $replica);
     }
 
@@ -183,19 +184,28 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    * {@inheritdoc}
    */
   protected function getFilesystem() {
-    if (isset($this->filesystem)) {
-      return $this->filesystem;
+    if (!isset($this->filesystem)) {
+      $this->filesystem = $this->getFilesystemForScheme($this->getProtocol());
     }
-
-    $scheme = $this->getProtocol();
-
-    if (!isset(static::$filesystems[$scheme])) {
-      static::$filesystems[$scheme] = new Filesystem($this->getNewAdapter($scheme));
-    }
-
-    $this->filesystem = static::$filesystems[$scheme];
 
     return $this->filesystem;
+  }
+
+  /**
+   * Returns the filesystem for a given scheme.
+   *
+   * @param string $scheme
+   *   The scheme.
+   *
+   * @return \League\Flysystem\FilesystemInterface
+   *   The filesystem for the scheme.
+   */
+  public static function getFilesystemForScheme($scheme) {
+    if (!isset(static::$filesystems[$scheme])) {
+      static::$filesystems[$scheme] = new Filesystem(static::getNewAdapter($scheme));
+    }
+
+    return static::$filesystems[$scheme];
   }
 
   /**

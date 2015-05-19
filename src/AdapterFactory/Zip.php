@@ -15,7 +15,7 @@ class Zip implements AdapterFactoryInterface {
    * {@inheritdoc}
    */
   public static function canRegister() {
-    return extension_loaded('zip');
+    return extension_loaded('zip') && class_exists('League\Flysystem\ZipArchive\ZipArchiveAdapter');
   }
 
   /**
