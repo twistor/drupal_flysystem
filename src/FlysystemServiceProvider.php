@@ -21,6 +21,7 @@ class FlysystemServiceProvider implements ServiceProviderInterface {
    */
   public function register(ContainerBuilder $container) {
     foreach (Settings::get('flysystem', []) as $scheme => $settings) {
+
       $container
         ->register('flysystem_stream_wrapper.' . $scheme, 'Drupal\flysystem\FlysystemBridge')
         ->addTag('stream_wrapper', ['scheme' => $scheme]);

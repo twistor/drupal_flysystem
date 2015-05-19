@@ -27,21 +27,11 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
   use UrlGeneratorTrait;
 
   /**
-   * A map from adapter type to adapter factory.
+   * A static class for plugins.
    *
    * @var array
-   *
-   * @todo  Figure out a way for other modules to register adapters.
    */
-  protected static $adapterMap = [
-    'dropbox' => 'Drupal\flysystem\AdapterFactory\Dropbox',
-    'ftp' => 'Drupal\flysystem\AdapterFactory\Ftp',
-    'local' => 'Drupal\flysystem\AdapterFactory\Local',
-    'rackspace' => 'Drupal\flysystem\AdapterFactory\Rackspace',
-    's3v2' => 'Drupal\flysystem\AdapterFactory\S3v2',
-    'sftp' => 'Drupal\flysystem\AdapterFactory\Sftp',
-    'zip' => 'Drupal\flysystem\AdapterFactory\Zip',
-  ];
+  protected static $plugins = [];
 
   /**
    * {@inheritdoc}
@@ -82,15 +72,7 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    * {@inheritdoc}
    */
   public function getExternalUrl() {
-    $scheme = $this->getProtocol();
-    $path = str_replace('\\', '/', $this->getTarget());
-
-    $settings = $this->getSettingsForScheme($scheme);
-    if ($settings['prefix']) {
-      return $settings['prefix'] . UrlHelper::encodePath($path);
-    }
-
-    return $this->url('flysystem.download', ['scheme' => $scheme, 'path' => $path], ['absolute' => TRUE]);
+    return $this->getPluginFormScheme($this->getProtocol())->getExternalUrl($this->uri);
   }
 
   /**
@@ -148,6 +130,28 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
   }
 
   /**
+   * Returns the plugin for a given scheme.
+   *
+   * @param string $scheme
+   *   The scheme.
+   *
+   * @return \Drupal\flysystem\Plugin\FlysystemPluginInterface
+   *   The plugin for the scheme.
+   */
+  protected static function getPluginFormScheme($scheme) {
+    if (isset(static::$plugins[$scheme])) {
+      return static::$plugins[$scheme];
+    }
+
+    $settings = static::getSettingsForScheme($scheme);
+
+    $plugin = \Drupal::service('plugin.manager.flysystem')->createInstance($settings['type'], $settings['config']);
+    static::$plugins[$scheme] = $plugin;
+
+    return $plugin;
+  }
+
+  /**
    * Returns the adapter for the current scheme.
    *
    * @param string $scheme
@@ -156,39 +160,20 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    * @return \League\Flysystem\AdapterInterface
    *   The correct adapter from settings.
    */
-  protected static function getNewAdapter($scheme) {
+  protected static function getAdapterForScheme($scheme) {
     $settings = static::getSettingsForScheme($scheme);
-
-    if (isset(static::$adapterMap[$settings['type']])) {
-      $factory = static::$adapterMap[$settings['type']];
-      $adapter = $factory::create($settings['config']);
-    }
-    else {
-      $adapter = new NullAdapter();
-    }
+    $adapter = static::getPluginFormScheme($scheme)->getAdapter();
 
     if ($settings['replicate']) {
-      $replica = static::getNewAdapter($settings['replicate']);
+      $replica = static::getAdapterForScheme($settings['replicate']);
       $adapter = new ReplicateAdapter($adapter, $replica);
     }
 
     if ($settings['cache']) {
-      $store = \Drupal::service('flysystem_cache');
-      $adapter = new CachedAdapter($adapter, $store);
+      $adapter = new CachedAdapter($adapter, \Drupal::service('flysystem_cache'));
     }
 
     return $adapter;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function getFilesystem() {
-    if (!isset($this->filesystem)) {
-      $this->filesystem = $this->getFilesystemForScheme($this->getProtocol());
-    }
-
-    return $this->filesystem;
   }
 
   /**
@@ -202,10 +187,21 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    */
   public static function getFilesystemForScheme($scheme) {
     if (!isset(static::$filesystems[$scheme])) {
-      static::$filesystems[$scheme] = new Filesystem(static::getNewAdapter($scheme));
+      static::$filesystems[$scheme] = new Filesystem(static::getAdapterForScheme($scheme));
     }
 
     return static::$filesystems[$scheme];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getFilesystem() {
+    if (!isset($this->filesystem)) {
+      $this->filesystem = $this->getFilesystemForScheme($this->getProtocol());
+    }
+
+    return $this->filesystem;
   }
 
   /**

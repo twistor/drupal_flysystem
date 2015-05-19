@@ -1,4 +1,8 @@
 services:
+  plugin.manager.flysystem:
+    class: Drupal\flysystem\Plugin\FlysystemPluginManager
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
+
   flysystem_cache:
     class: Drupal\flysystem\DrupalFlysystemCache
     arguments: ['@cache.default', 'flysystem_files']
