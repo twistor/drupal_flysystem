@@ -30,10 +30,12 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    * @todo  Figure out a way for other modules to register adapters.
    */
   protected static $adapterMap = [
-    'zip' => 'Drupal\flysystem\AdapterFactory\Zip',
-    'sftp' => 'Drupal\flysystem\AdapterFactory\Sftp',
+    'dropbox' => 'Drupal\flysystem\AdapterFactory\Dropbox',
     'local' => 'Drupal\flysystem\AdapterFactory\Local',
+    'rackspace' => 'Drupal\flysystem\AdapterFactory\Rackspace',
     's3' => 'Drupal\flysystem\AdapterFactory\S3',
+    'sftp' => 'Drupal\flysystem\AdapterFactory\Sftp',
+    'zip' => 'Drupal\flysystem\AdapterFactory\Zip',
   ];
 
   /**
