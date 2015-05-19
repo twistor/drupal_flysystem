@@ -140,17 +140,23 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    * {@inheritdoc}
    */
   protected function getFilesystem() {
-    $scheme = $this->getProtocol();
-
-    if (isset(static::$filesystems[$scheme])) {
-      return static::$filesystems[$scheme];
+    if (isset($this->filesystem)) {
+      return $this->filesystem;
     }
 
-    $store = \Drupal::service('flysystem_cache');
-    $adapter = new CachedAdapter($this->getNewAdapter(), $store);
-    static::$filesystems[$scheme] = new Filesystem($adapter);
+    $scheme = $this->getProtocol();
 
-    return static::$filesystems[$scheme];
+    // We need these two levels of cache to be able to support setFileSystem().
+    // @todo Fix this. It's ugly.
+    if (!isset(static::$filesystems[$scheme])) {
+      $store = \Drupal::service('flysystem_cache');
+      $adapter = new CachedAdapter($this->getNewAdapter(), $store);
+      static::$filesystems[$scheme] = new Filesystem($adapter);
+    }
+
+    $this->filesystem = static::$filesystems[$scheme];
+
+    return $this->filesystem;
   }
 
   /**
