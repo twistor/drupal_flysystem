@@ -1,6 +1,6 @@
 {
   "name": "drupal/flysystem",
   "require": {
-    "league/flysystem": "~1.0"
+    "twistor/flysystem-stream-wrapper": "~1.0"
   }
 }
