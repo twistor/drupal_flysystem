@@ -31,6 +31,7 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    */
   protected static $adapterMap = [
     'dropbox' => 'Drupal\flysystem\AdapterFactory\Dropbox',
+    'ftp' => 'Drupal\flysystem\AdapterFactory\Ftp',
     'local' => 'Drupal\flysystem\AdapterFactory\Local',
     'rackspace' => 'Drupal\flysystem\AdapterFactory\Rackspace',
     's3' => 'Drupal\flysystem\AdapterFactory\S3',
