@@ -157,7 +157,7 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    *   The correct adapter from settings.
    */
   protected static function getNewAdapter($scheme) {
-    $settings = $this->getSettingsForScheme($scheme);
+    $settings = static::getSettingsForScheme($scheme);
 
     if (isset(static::$adapterMap[$settings['type']])) {
       $factory = static::$adapterMap[$settings['type']];
