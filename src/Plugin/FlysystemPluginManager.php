@@ -36,18 +36,26 @@ class FlysystemPluginManager extends DefaultPluginManager implements FallbackPlu
   /**
    * {@inheritdoc}
    */
-  public function createInstance($plugin_id, array $configuration = array()) {
-    foreach ($this->getDefinition($plugin_id)['extensions'] as $extension) {
-      if (!extension_loaded($extension)) {
-        return $this->createInstance($this->getFallbackPluginId($plugin_id, $configuration));
-      }
-    }
-
-    return parent::createInstance($plugin_id, $configuration);
-  }
-
   public function getFallbackPluginId($plugin_id, array $configuration = array()) {
     return 'null';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function alterDefinitions(&$definitions) {
+    // Remove definitions that are missing necessary extensions.
+    foreach ($definitions as $id => $definition) {
+      foreach ($definition['extensions'] as $extension) {
+        if (extension_loaded($extension)) {
+          continue;
+        }
+
+        unset($definitions[$id]);
+        break;
+      }
+    }
+    parent::alterDefinitions($definitions);
   }
 
 }
