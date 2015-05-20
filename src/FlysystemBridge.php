@@ -186,7 +186,9 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    */
   public static function getFilesystemForScheme($scheme) {
     if (!isset(static::$filesystems[$scheme])) {
-      static::$filesystems[$scheme] = new Filesystem(static::getAdapterForScheme($scheme));
+      $filesystem = new Filesystem(static::getAdapterForScheme($scheme));
+      static::registerPlugins($filesystem);
+      static::$filesystems[$scheme] = $filesystem;
     }
 
     return static::$filesystems[$scheme];
