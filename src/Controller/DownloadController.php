@@ -3,29 +3,31 @@
 namespace Drupal\flysystem\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Site\Settings;
+use Drupal\flysystem\FlysystemBridge;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 
 class DownloadController extends ControllerBase {
 
-  public function serve($scheme, $path, Request $request) {
-    $uri = $scheme . '://' . $path;
-
-    if (!file_stream_wrapper_valid_scheme($scheme) || !file_exists($uri)) {
+  public function serve($scheme, $path) {
+    if (!isset(Settings::get('flysystem', [])[$scheme])) {
       throw new NotFoundHttpException();
     }
 
-    // Let other modules provide headers and controls access to the file.
-    $headers = $this->moduleHandler()->invokeAll('file_download', array($uri));
+    $filesystem = FlysystemBridge::getFilesystemForScheme($scheme);
 
-    if (empty($headers) || in_array(-1, $headers)) {
-      throw new AccessDeniedHttpException();
+    if (!$filesystem->has($path)) {
+      throw new NotFoundHttpException();
     }
 
-    return new BinaryFileResponse($uri, 200, $headers);
+    $headers = array(
+      'Content-Type' => \Drupal::service('file.mime_type.guesser.extension')->guess($path),
+      'Content-Length' => $filesystem->getSize($path),
+    );
+
+    return new BinaryFileResponse($scheme . '://' . $path, 200, $headers);
   }
 
 }

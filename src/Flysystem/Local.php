@@ -20,7 +20,7 @@ use League\Flysystem\Adapter\Local as LocalAdapter;
  */
 class Local implements FlysystemPluginInterface {
 
-  use FlysystemUrlTrait;
+  use FlysystemUrlTrait { getExternalUrl as getDownloadlUrl; }
 
   /**
    * The root of the local adapter.
@@ -63,7 +63,7 @@ class Local implements FlysystemPluginInterface {
    */
   public function getExternalUrl($uri) {
     if (!$this->isPublic) {
-      return parent::getExternalUrl($uri);
+      return $this->getDownloadlUrl($uri);
     }
 
     list(, $path) = explode('://', $uri, 2);
