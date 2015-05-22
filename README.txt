@@ -4,6 +4,7 @@ Flysystem
 ## REQUIREMENTS ##
 
 - PHP 5.4 or greater
+- The mbstring extension. (http://php.net/manual/en/book.mbstring.php)
 - Composer (https://getcomposer.org)
 - Composer manager (https://www.drupal.org/project/composer_manager)
 
@@ -15,18 +16,18 @@ important.
  1. Download and install composer_manager.
  2. Download flysystem.
  3. cd into the core/ directory
- 4. # composer drupal-rebuild && composer update --prefer-source
+ 4. # composer drupal-rebuild && composer update
  5. Install Flysystem.
  6. Enjoy.
 
 ## CONFIGURATION ##
 
 Stream wrappers are configured in settings.php. The keys (localexample) are the
-names of the stream wrappers. The 'type' key, is the type of adapter. Available
-adapters are:
+names of the stream wrappers. Can be used like 'localexample://filename.txt' The
+'type' key, is the type of adapter. Available adapters are:
 
  - local
- - ftp
+ - ftp (Requires the ftp extension)
  - dropbox (https://www.drupal.org/project/flysystem_dropbox)
  - rackspace (https://www.drupal.org/project/flysystem_rackspace)
  - s3v2 (https://www.drupal.org/project/flysystem_s3)
@@ -38,13 +39,28 @@ The 'config' key is the settings that will be passed into the Flysystem adapter.
 Example configuration:
 
 $schemes = [
-  'localexample' => [
-    'type' => 'local',
+  'localexample' => [            // The name of the stream wrapper. localexample://
+
+    'type' => 'local',           // The plugin key.
+
     'config' => [
       'root' => '/path/to/dir',  // If 'root' is inside the public directory,
-    ],                           // then files will be served directly.
+    ],                           // then files will be served directly. Can be
+                                 // relative or absolute.
+
+    // Optional settings that apply to all adapters.
+
+    'cache' => TRUE,             // Cache filesystem metadata. Not necessary,
+                                 // since this is a local filesystem.
+
     'replicate' => 'ftpexample', // 'replicate' writes to both filesystems, but
-  ],                             // reads from this one.
+                                 // reads from this one. Functions as a backup.
+
+    'serve_js' => TRUE,          // Serve Javascript or CSS via this stream wrapper.
+    'serve_css' => TRUE,         // This is useful for adapters that function as
+                                 // CDNs like the S3 adapter.
+  ],
+
   'ftpexample' => [
     'type' => 'ftp',
     'config' => [
@@ -56,11 +72,14 @@ $schemes = [
       'port' => 21,
       'root' => '/path/to/root',
       'passive' => true,
-      'ssl' => true,
-      'timeout' => 30,
+      'ssl' => false,
+      'timeout' => 90,
+      'permPrivate' => 0700,
+      'permPublic' => 0700,
+      'transferMode' => FTP_BINARY,
     ],
-    'cache' => TRUE, // Cache filesystem metadata. Not necessary, since this is
-  ],                 // a replica.
+  ],
 ];
 
+// Don't forget this!
 $settings['flysystem'] = $schemes;
