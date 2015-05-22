@@ -9,7 +9,6 @@ namespace Drupal\flysystem\Asset;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Asset\AssetDumper as DrupalAssetDumper;
-use Drupal\Core\Site\Settings;
 
 /**
  * Flysystem dependency injection container.
@@ -26,8 +25,6 @@ class AssetDumper extends DrupalAssetDumper {
     // starting with "ad*".
     $filename = $file_extension. '_' . Crypt::hashBase64($data) . '.' . $file_extension;
     // Create the css/ or js/ path within the files folder.
-
-    $scheme = isset($this->schemes[$file_extension]) ? $this->schemes[$file_extension] : 'public';
 
     $path = $this->getSchemeFromExtension($file_extension) . '://' . $file_extension;
     $uri = $path . '/' . $filename;

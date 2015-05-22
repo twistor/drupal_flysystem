@@ -34,7 +34,7 @@ class Local implements FlysystemPluginInterface {
    *
    * @var bool
    */
-  protected $isPublic;
+  protected $publicPath;
 
   /**
    * Constructs a Local object.
@@ -44,11 +44,7 @@ class Local implements FlysystemPluginInterface {
    */
   public function __construct(array $configuration) {
     $this->root = $configuration['root'];
-
-    $root = realpath($configuration['root']);
-    $public = realpath($this->basePath());
-
-    $this->isPublic = strpos($public, $root) === 0;
+    $this->publicPath = $this->pathIsPublic($this->root);
   }
 
   /**
@@ -62,14 +58,13 @@ class Local implements FlysystemPluginInterface {
    * {@inheritdoc}
    */
   public function getExternalUrl($uri) {
-    if (!$this->isPublic) {
+    if (!$this->publicPath) {
       return $this->getDownloadlUrl($uri);
     }
 
-    list(, $path) = explode('://', $uri, 2);
-    $path = str_replace('\\', '/', $path);
+    $path = str_replace('\\', '/', $this->publicPath . '/' . $this->getTarget($uri));
 
-    return $GLOBALS['base_url'] . '/' . $this->basePath() . '/' . UrlHelper::encodePath($path);
+    return $GLOBALS['base_url'] . '/' . UrlHelper::encodePath($path);
   }
 
   /**
@@ -80,6 +75,41 @@ class Local implements FlysystemPluginInterface {
    */
   protected static function basePath() {
     return Settings::get('file_public_path', conf_path() . '/files');
+  }
+
+  /**
+   * Determines if the path is inside the public path.
+   *
+   * @param string $root
+   *   The root path.
+   *
+   * @return string|false
+   *   The public path, or false.
+   */
+  protected function pathIsPublic($root) {
+    $base_path = $this->basePath();
+
+    $public = realpath($base_path);
+    $root = realpath($root);
+
+    if ($public === FALSE || $root === FALSE) {
+      return FALSE;
+    }
+
+    // The same directory.
+    if ($public === $root) {
+      return $base_path;
+    }
+
+    if (strpos($root, $public) !== 0) {
+      return FALSE;
+    }
+
+    if (($subpath = substr($root, strlen($public))) && $subpath[0] === DIRECTORY_SEPARATOR) {
+      return $base_path . '/' . ltrim($subpath, DIRECTORY_SEPARATOR);
+    }
+
+    return FALSE;
   }
 
 }
