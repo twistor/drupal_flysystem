@@ -5,13 +5,11 @@
  * Contains \Drupal\Tests\flysystem\Unit\Flysystem\LocalTest.
  */
 
-namespace Drupal\Tests\flysystem\Unit\Flysystem;
+namespace NoDrupal\Tests\flysystem\Unit\Flysystem;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Site\Settings;
 use Drupal\flysystem\Flysystem\Local;
-use Drupal\flysystem\Plugin\FlysystemPluginInterface;
-use League\Flysystem\Adapter\Local as LocalAdapter;
 use Prophecy\Argument;
 
 /**
@@ -47,12 +45,12 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     $configuration = ['root' => $this->tmpdir . '/flysystem2'];
 
     $plugin = Local::create($container, $configuration, NULL, NULL);
-    $this->assertTrue($plugin instanceof FlysystemPluginInterface);
+    $this->assertInstanceOf('Drupal\flysystem\Plugin\FlysystemPluginInterface', $plugin);
   }
 
   public function testGetAdapter() {
     $local = new Local($this->tmpdir, $this->tmpdir . '/flysystem');
-    $this->assertTrue($local->getAdapter() instanceof LocalAdapter);
+    $this->assertInstanceOf('League\Flysystem\Adapter\Local', $local->getAdapter());
   }
 
   public function testGetExternalUrl() {
