@@ -69,7 +69,7 @@ env:
 
     # Debug options
     # - DRUPAL_TI_DEBUG="-x -v"
-    - DRUPAL_TI_DEBUG="-v"
+    # - DRUPAL_TI_DEBUG="-v"
     # Set to "all" to output all files, set to e.g. "xvfb selenium" or "selenium",
     # etc. to only output those channels.
     #- DRUPAL_TI_DEBUG_FILE_OUTPUT="selenium xvfb webserver"
