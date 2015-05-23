@@ -19,6 +19,8 @@ use League\Flysystem\Replicate\ReplicateAdapter;
  */
 class FlysystemFactory {
 
+  use SerializationStopperTrait;
+
   /**
    * Default settings.
    *
@@ -163,13 +165,6 @@ class FlysystemFactory {
    */
   protected function getSettings($scheme) {
     return isset($this->settings[$scheme]) ? $this->settings[$scheme] : $this->defaults;
-  }
-
-  /**
-   * Prevents the factory from being serialized.
-   */
-  public function __sleep() {
-    throw new \LogicException('FlysystemFactory can not be serialized. This probably means you are serializing an object that has an indirect reference to the FlysystemFactory object. Adjust your code so that is not necessary.');
   }
 
 }
