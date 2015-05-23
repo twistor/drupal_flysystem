@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\Testsflysystem\Unit\Flysystem\LocalTest.
+ * Contains \Drupal\Tests\flysystem\Unit\Flysystem\LocalTest.
  */
 
-namespace Drupal\Testsflysystem\Unit\Flysystem;
+namespace Drupal\Tests\flysystem\Unit\Flysystem;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Site\Settings;
