@@ -8,9 +8,7 @@
 namespace Drupal\flysystem\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Site\Settings;
 use Drupal\flysystem\FlysystemFactory;
-use Drupal\flysystem\SerializationStopperTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
@@ -20,8 +18,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * Allows Flysystem schemes to be downloaded.
  */
 class DownloadController extends ControllerBase {
-
-  use SerializationStopperTrait;
 
   /**
    * The Flysytem factory.
@@ -38,26 +34,16 @@ class DownloadController extends ControllerBase {
   protected $guesser;
 
   /**
-   * The Flysystem settings.
-   *
-   * @var array
-   */
-  protected $settings;
-
-  /**
    * Constructs a DownloadController object.
    *
    * @param \Drupal\flysystem\FlysystemFactory $factory
    *   The Flysystem factory.
    * @param Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface $guesser
    *   The mimetype guesser.
-   * @param array $settings
-   *   The Flysystem settings.
    */
-  public function __construct(FlysystemFactory $factory, MimeTypeGuesserInterface $guesser, array $settings) {
+  public function __construct(FlysystemFactory $factory, MimeTypeGuesserInterface $guesser) {
     $this->factory = $factory;
     $this->guesser = $guesser;
-    $this->settings = $settings;
   }
 
   /**
@@ -66,8 +52,7 @@ class DownloadController extends ControllerBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('flysystem_factory'),
-      $container->get('file.mime_type.guesser.extension'),
-      $container->get('settings')->get('flysystem', [])
+      $container->get('file.mime_type.guesser.extension')
     );
   }
 
@@ -86,10 +71,6 @@ class DownloadController extends ControllerBase {
    *   Thrown if the file does not exist.
    */
   public function serve($scheme, $path) {
-    if (!isset($this->settings[$scheme])) {
-      throw new NotFoundHttpException();
-    }
-
     $filesystem = $this->factory->getFilesystem($scheme);
 
     if (!$filesystem->has($path)) {
