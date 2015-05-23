@@ -47,18 +47,6 @@ env:
     # Simpletest specific commandline arguments, the DRUPAL_TI_SIMPLETEST_GROUP is appended at the end.
     - DRUPAL_TI_SIMPLETEST_ARGS="--verbose --color --concurrency 4 --url $DRUPAL_TI_WEBSERVER_URL:$DRUPAL_TI_WEBSERVER_PORT"
 
-    # === Behat specific variables.
-    # This is relative to $TRAVIS_BUILD_DIR
-    - DRUPAL_TI_BEHAT_DIR="./tests/behat"
-    # These arguments are passed to the bin/behat command.
-    - DRUPAL_TI_BEHAT_ARGS=""
-    # Specify the filename of the behat.yml with the $DRUPAL_TI_DRUPAL_DIR variables.
-    - DRUPAL_TI_BEHAT_YML="behat.yml.dist"
-    # This is used to setup Xvfb.
-    - DRUPAL_TI_BEHAT_SCREENSIZE_COLOR="1280x1024x16"
-    # The version of seleniumthat should be used.
-    - DRUPAL_TI_BEHAT_SELENIUM_VERSION="2.44"
-
     # PHPUnit specific commandline arguments.
     - DRUPAL_TI_PHPUNIT_ARGS=""
 
@@ -88,21 +76,15 @@ mysql:
 
 before_install:
   - composer self-update
-  # - cd ./tests
-  - composer global require "lionsad/drupal_ti:1.*"
-  - drupal-ti before_install
 
 install:
-  - drupal-ti install
 
 before_script:
-  - drupal-ti before_script
 
 script:
-  - drupal-ti script
+  - phpunit
 
 after_script:
-  - drupal-ti after_script
 
 notifications:
   email: false
