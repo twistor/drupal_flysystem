@@ -5,7 +5,11 @@ namespace Drupal\flysystem\Plugin;
 interface FlysystemPluginInterface {
 
   /**
-   * Returns the Flysystem adapter
+   * Returns the Flysystem adapter.
+   *
+   * Plugins should not keep references to the adapter. If a plugin needs to
+   * perform filesystem operations, it should either use a scheme:// or have the
+   * \Drupal\flysystem\FlysystemFactory injected.
    *
    * @return \League\Flysystem\AdapterInterface
    *   The Flsysytem adapter.

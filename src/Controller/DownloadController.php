@@ -16,7 +16,7 @@ class DownloadController extends ControllerBase {
       throw new NotFoundHttpException();
     }
 
-    $filesystem = FlysystemBridge::getFilesystemForScheme($scheme);
+    $filesystem = \Druapl::service('flysystem_factory')->getFilesystem($scheme);
 
     if (!$filesystem->has($path)) {
       throw new NotFoundHttpException();

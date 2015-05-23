@@ -7,8 +7,8 @@ flysystem.download:
     path: .+
 
 flysystem.image_styles:
-  path: '/_flysystem/{scheme}/styles/{image_style}/{dud}'
+  path: '/_flysystem/{dud}/styles/{image_style}/{scheme}'
   defaults:
-    _controller:  '\Drupal\image\Controller\ImageStyleDownloadController::deliver'
+    _controller:  'Drupal\image\Controller\ImageStyleDownloadController::deliver'
   requirements:
     _access: 'TRUE'

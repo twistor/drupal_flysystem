@@ -27,13 +27,6 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
   use UrlGeneratorTrait;
 
   /**
-   * A static class for plugins.
-   *
-   * @var array
-   */
-  protected static $plugins = [];
-
-  /**
    * {@inheritdoc}
    */
   public static function getType() {
@@ -72,7 +65,10 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    * {@inheritdoc}
    */
   public function getExternalUrl() {
-    return $this->getPluginFormScheme($this->getProtocol())->getExternalUrl($this->uri);
+    return $this
+      ->getFactory()
+      ->getPlugin($this->getProtocol())
+      ->getExternalUrl($this->uri);
   }
 
   /**
@@ -107,75 +103,6 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
   }
 
   /**
-   * Finds the settings for a given scheme.
-   *
-   * @param string $scheme
-   *   The scheme.
-   *
-   * @return array
-   *   The settings array from settings.php.
-   */
-  protected static function getSettingsForScheme($scheme) {
-    $schemes = Settings::get('flysystem', []);
-
-    $settings = isset($schemes[$scheme]) ? $schemes[$scheme] : [];
-
-    return $settings += [
-      'type' => '',
-      'config' => [],
-      'replicate' => FALSE,
-      'cache' => FALSE,
-    ];
-  }
-
-  /**
-   * Returns the plugin for a given scheme.
-   *
-   * @param string $scheme
-   *   The scheme.
-   *
-   * @return \Drupal\flysystem\Plugin\FlysystemPluginInterface
-   *   The plugin for the scheme.
-   */
-  protected static function getPluginFormScheme($scheme) {
-    if (isset(static::$plugins[$scheme])) {
-      return static::$plugins[$scheme];
-    }
-
-    $settings = static::getSettingsForScheme($scheme);
-
-    $plugin = \Drupal::service('plugin.manager.flysystem')->createInstance($settings['type'], $settings['config']);
-    static::$plugins[$scheme] = $plugin;
-
-    return $plugin;
-  }
-
-  /**
-   * Returns the adapter for the current scheme.
-   *
-   * @param string $scheme
-   *   The scheme to find an adapter for.
-   *
-   * @return \League\Flysystem\AdapterInterface
-   *   The correct adapter from settings.
-   */
-  protected static function getAdapterForScheme($scheme) {
-    $settings = static::getSettingsForScheme($scheme);
-    $adapter = static::getPluginFormScheme($scheme)->getAdapter();
-
-    if ($settings['replicate']) {
-      $replica = static::getAdapterForScheme($settings['replicate']);
-      $adapter = new ReplicateAdapter($adapter, $replica);
-    }
-
-    if ($settings['cache']) {
-      $adapter = new CachedAdapter($adapter, \Drupal::service('flysystem_cache'));
-    }
-
-    return $adapter;
-  }
-
-  /**
    * Returns the filesystem for a given scheme.
    *
    * @param string $scheme
@@ -186,9 +113,8 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    */
   public static function getFilesystemForScheme($scheme) {
     if (!isset(static::$filesystems[$scheme])) {
-      $filesystem = new Filesystem(static::getAdapterForScheme($scheme));
-      static::registerPlugins($filesystem);
-      static::$filesystems[$scheme] = $filesystem;
+      static::$filesystems[$scheme] = static::getFactory()->getFilesystem($scheme);
+      static::registerPlugins(static::$filesystems[$scheme]);
     }
 
     return static::$filesystems[$scheme];
@@ -206,15 +132,13 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
   }
 
   /**
-   * Sets the filesystem.
+   * Returns the filesystem factory.
    *
-   * @param \League\Flysystem\FilesystemInterface $filesystem
-   *   The filesystem.
-   *
-   * @internal Only used during tests.
+   * @return \Drupal\flysystem\FlysystemFactory
+   *   The Flysystem factory.
    */
-  public function setFileSystem(FilesystemInterface $filesystem) {
-    $this->filesystem = $filesystem;
+  protected static function getFactory() {
+    return \Drupal::service('flysystem_factory');
   }
 
 }
