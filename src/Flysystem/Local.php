@@ -56,7 +56,7 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
   public function __construct($base_path, $root) {
     $this->root = $root;
     $this->basePath = $base_path;
-    $this->publicPath = $this->pathIsPublic($root);
+    $this->publicPath = $this->pathIsPublic($base_path, $root);
   }
 
   /**
@@ -95,14 +95,16 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
   /**
    * Determines if the path is inside the public path.
    *
+   * @param string $base_path
+   *   The path to the public files directory.
    * @param string $root
    *   The root path.
    *
    * @return string|false
    *   The public path, or false.
    */
-  protected function pathIsPublic($root) {
-    $public = realpath($this->basePath);
+  protected function pathIsPublic($base_path, $root) {
+    $public = realpath($base_path);
     $root = realpath($root);
 
     if ($public === FALSE || $root === FALSE) {
@@ -111,7 +113,7 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
 
     // The same directory.
     if ($public === $root) {
-      return $this->basePath;
+      return $base_path;
     }
 
     if (strpos($root, $public) !== 0) {
@@ -119,7 +121,7 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
     }
 
     if (($subpath = substr($root, strlen($public))) && $subpath[0] === DIRECTORY_SEPARATOR) {
-      return $this->basePath . '/' . ltrim($subpath, DIRECTORY_SEPARATOR);
+      return $base_path . '/' . ltrim($subpath, DIRECTORY_SEPARATOR);
     }
 
     return FALSE;
