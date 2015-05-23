@@ -63,19 +63,19 @@ env:
     - DRUPAL_TI_PHPUNIT_ARGS=""
 
     # Code coverage via coveralls.io
-    - DRUPAL_TI_COVERAGE="satooshi/php-coveralls:0.6.*"
+    #- DRUPAL_TI_COVERAGE="satooshi/php-coveralls:0.6.*"
     # This needs to match your .coveralls.yml file.
-    - DRUPAL_TI_COVERAGE_FILE="build/logs/clover.xml"
+    #- DRUPAL_TI_COVERAGE_FILE="build/logs/clover.xml"
 
     # Debug options
-    #- DRUPAL_TI_DEBUG="-x -v"
+    - DRUPAL_TI_DEBUG="-x -v"
     # Set to "all" to output all files, set to e.g. "xvfb selenium" or "selenium",
     # etc. to only output those channels.
     #- DRUPAL_TI_DEBUG_FILE_OUTPUT="selenium xvfb webserver"
 
   matrix:
     # [[[ SELECT ANY OR MORE OPTIONS ]]]
-    - DRUPAL_TI_RUNNERS="phpunit simpletest"
+    - DRUPAL_TI_RUNNERS="phpunit"
     #- DRUPAL_TI_RUNNERS="simpletest"
     #- DRUPAL_TI_RUNNERS="behat"
     #- DRUPAL_TI_RUNNERS="phpunit simpletest behat"
