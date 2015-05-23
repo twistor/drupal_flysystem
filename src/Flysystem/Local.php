@@ -7,20 +7,36 @@
 
 namespace Drupal\flysystem\Flysystem;
 
-use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\Site\Settings;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\flysystem\Plugin\FlysystemPluginInterface;
 use Drupal\flysystem\Plugin\FlysystemUrlTrait;
 use League\Flysystem\Adapter\Local as LocalAdapter;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Drupal plugin for the "Local" Flysystem adapter.
  *
  * @Adapter(id = "local")
  */
-class Local implements FlysystemPluginInterface {
+class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface {
 
-  use FlysystemUrlTrait { getExternalUrl as getDownloadlUrl; }
+  use FlysystemUrlTrait {
+    getExternalUrl as getDownloadlUrl;
+  }
+
+  /**
+   * The path to the public files.
+   *
+   * @var string
+   */
+  protected $basePath;
+
+  /**
+   * Whether the root is in the public path.
+   *
+   * @var string|false
+   */
+  protected $publicPath;
 
   /**
    * The root of the local adapter.
@@ -30,21 +46,30 @@ class Local implements FlysystemPluginInterface {
   protected $root;
 
   /**
-   * Whether the root is in the public path.
-   *
-   * @var bool
-   */
-  protected $publicPath;
-
-  /**
    * Constructs a Local object.
    *
-   * @param array $configuration
-   *   Plugin configuration array.
+   * @param string $base_path
+   *   The path to the public files directory.
+   * @param string $root
+   *   The of the adapter's filesystem.
    */
-  public function __construct(array $configuration) {
-    $this->root = $configuration['root'];
-    $this->publicPath = $this->pathIsPublic($this->root);
+  public function __construct($base_path, $root) {
+    $this->root = $root;
+    $this->basePath = $base_path;
+    $this->publicPath = $this->pathIsPublic($root);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    $default = $container->get('kernel')->getSitePath() . '/files';
+
+    $base_path = $container
+      ->get('settings')
+      ->get('file_public_path', $default);
+
+    return new static($base_path, $configuration['root']);
   }
 
   /**
@@ -64,17 +89,7 @@ class Local implements FlysystemPluginInterface {
 
     $path = str_replace('\\', '/', $this->publicPath . '/' . $this->getTarget($uri));
 
-    return $GLOBALS['base_url'] . '/' . UrlHelper::encodePath($path);
-  }
-
-  /**
-   * Returns the base path for public://.
-   *
-   * @return string
-   *   The base path for public:// typically sites/default/files.
-   */
-  protected static function basePath() {
-    return Settings::get('file_public_path', conf_path() . '/files');
+    return $this->getUrlGenerator()->generateFromPath($path, ['absolute' => TRUE]);
   }
 
   /**
@@ -87,9 +102,7 @@ class Local implements FlysystemPluginInterface {
    *   The public path, or false.
    */
   protected function pathIsPublic($root) {
-    $base_path = $this->basePath();
-
-    $public = realpath($base_path);
+    $public = realpath($this->basePath);
     $root = realpath($root);
 
     if ($public === FALSE || $root === FALSE) {
@@ -98,7 +111,7 @@ class Local implements FlysystemPluginInterface {
 
     // The same directory.
     if ($public === $root) {
-      return $base_path;
+      return $this->basePath;
     }
 
     if (strpos($root, $public) !== 0) {
@@ -106,7 +119,7 @@ class Local implements FlysystemPluginInterface {
     }
 
     if (($subpath = substr($root, strlen($public))) && $subpath[0] === DIRECTORY_SEPARATOR) {
-      return $base_path . '/' . ltrim($subpath, DIRECTORY_SEPARATOR);
+      return $this->basePath . '/' . ltrim($subpath, DIRECTORY_SEPARATOR);
     }
 
     return FALSE;
