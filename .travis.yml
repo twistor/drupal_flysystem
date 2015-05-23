@@ -25,52 +25,8 @@ env:
     # see: https://github.com/drush-ops/drush#install---composer
     - PATH="$PATH:$HOME/.composer/vendor/bin"
 
-    # Configuration variables.
-    - DRUPAL_TI_MODULE_NAME="flysystem"
-    - DRUPAL_TI_SIMPLETEST_GROUP="Flysystem"
-
-    # Define runners and environment vars to include before and after the
-    # main runners / environment vars.
-    #- DRUPAL_TI_SCRIPT_DIR_BEFORE="./drupal_ti/before"
-    #- DRUPAL_TI_SCRIPT_DIR_AFTER="./drupal_ti/after"
-
-    # The environment to use, supported are: drupal-7, drupal-8
-    - DRUPAL_TI_ENVIRONMENT="drupal-8"
-
-    # Drupal specific variables.
-    - DRUPAL_TI_DB="drupal_travis_db"
-    - DRUPAL_TI_DB_URL="mysql://root:@127.0.0.1/drupal_travis_db"
-    # Note: Do not add a trailing slash here.
-    - DRUPAL_TI_WEBSERVER_URL="http://127.0.0.1"
-    - DRUPAL_TI_WEBSERVER_PORT="8080"
-
-    # Simpletest specific commandline arguments, the DRUPAL_TI_SIMPLETEST_GROUP is appended at the end.
-    - DRUPAL_TI_SIMPLETEST_ARGS="--verbose --color --concurrency 4 --url $DRUPAL_TI_WEBSERVER_URL:$DRUPAL_TI_WEBSERVER_PORT"
-
-    # PHPUnit specific commandline arguments.
-    - DRUPAL_TI_PHPUNIT_ARGS=""
-
-    # Code coverage via coveralls.io
-    #- DRUPAL_TI_COVERAGE="satooshi/php-coveralls:0.6.*"
-    # This needs to match your .coveralls.yml file.
-    #- DRUPAL_TI_COVERAGE_FILE="build/logs/clover.xml"
-
-    # Debug options
-    # - DRUPAL_TI_DEBUG="-x -v"
-    # - DRUPAL_TI_DEBUG="-v"
-    # Set to "all" to output all files, set to e.g. "xvfb selenium" or "selenium",
-    # etc. to only output those channels.
-    #- DRUPAL_TI_DEBUG_FILE_OUTPUT="selenium xvfb webserver"
-
-  matrix:
-    # [[[ SELECT ANY OR MORE OPTIONS ]]]
-    - DRUPAL_TI_RUNNERS="phpunit simpletest"
-    #- DRUPAL_TI_RUNNERS="simpletest"
-    #- DRUPAL_TI_RUNNERS="behat"
-    #- DRUPAL_TI_RUNNERS="phpunit simpletest behat"
-
 mysql:
-  database: drupal_travis_db
+  database: drupal
   username: root
   encoding: utf8
 
@@ -78,11 +34,25 @@ before_install:
   - composer self-update
 
 install:
-
-before_script:
+  - composer global require drush/drush:dev-master
+  - phpenv rehash
+  - cd ..
+  - git clone --branch 8.0.x http://git.drupal.org/project/drupal.git
+  - mv drupal_flysystem drupal/modules/flysystem
+  - cd drupal
+  - drush --verbose site-install --db-url=mysql://root:@127.0.0.1/drupal --yes
+  - drush dl composer_manager --destination=modules --dev
+  - drush en flysystem simpletest -y
 
 script:
-  - phpunit
+  - php modules/composer_manager/scripts/init.sh
+  - cd core
+  - composer drupal-rebuild
+  - composer update --prefer-source
+  - vendor/bin/phpunit --verbose --group Flysystem
+  - drush rs&
+  - sleep 5
+  - php scripts/run-tests.sh --url http://127.0.0.1:8888 --module flysystem --php /usr/bin/php
 
 after_script:
 
