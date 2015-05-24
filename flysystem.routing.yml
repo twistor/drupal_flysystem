@@ -1,14 +1,8 @@
-flysystem.download:
-  path: '/_flysystem/{scheme}/{path}'
+flysystem.serve:
+  path: '/_flysystem/{scheme}/{filepath}'
   defaults:
-    _controller: 'Drupal\flysystem\Controller\DownloadController::serve'
+    _controller: 'Drupal\system\FileDownloadController::download'
   requirements:
     _access: 'TRUE'
-    path: .+
-
-flysystem.image_styles:
-  path: '/_flysystem/{dud}/styles/{image_style}/{scheme}'
-  defaults:
-    _controller:  'Drupal\image\Controller\ImageStyleDownloadController::deliver'
-  requirements:
-    _access: 'TRUE'
+    scheme: '^[a-zA-Z0-9+.-]+$'
+    filepath: .+

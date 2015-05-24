@@ -36,10 +36,10 @@ trait FlysystemUrlTrait {
 
     $arguments = [
       'scheme' => $this->getScheme($uri),
-      'path' => $path,
+      'filepath' => $path,
     ];
 
-    return $this->url('flysystem.download', $arguments, ['absolute' => TRUE]);
+    return $this->url('flysystem.serve', $arguments, ['absolute' => TRUE]);
   }
 
   /**

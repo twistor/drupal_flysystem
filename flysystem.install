@@ -32,5 +32,5 @@ function flysystem_requirements($phase) {
  * Implements hook_install().
  */
 function flysystem_install() {
-  \Drupal::service('flysystem_factory')->ensure();
+  Drupal::service('flysystem_factory')->ensure();
 }

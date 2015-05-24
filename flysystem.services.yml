@@ -12,6 +12,6 @@ services:
     arguments: ['@plugin.manager.flysystem', '@cache.default', '@settings', '@logger.channel.flysystem']
 
   path_processor.flysystem:
-    class: Drupal\flysystem\PathProcessor\PathProcessorImageStyles
+    class: Drupal\flysystem\PathProcessor\FlysystemPathProcessor
     tags:
-      - { name: path_processor_inbound, priority: 300 }
+      - { name: path_processor_inbound, priority: 400 }
