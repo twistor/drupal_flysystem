@@ -49,7 +49,8 @@ script:
   - cd core
   - composer drupal-rebuild
   - composer update --prefer-source
-  - vendor/bin/phpunit --verbose --group Flysystem
+  - cd ../modules/flysystem
+  - ../../core/vendor/bin/phpunit
   # - drush rs&
   # - sleep 5
   # - php scripts/run-tests.sh --url http://127.0.0.1:8888 --module flysystem --php /usr/bin/php
