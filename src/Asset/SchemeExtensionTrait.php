@@ -23,7 +23,7 @@ trait SchemeExtensionTrait {
    * @return string
    *   The scheme that should serve the extension.
    */
-  public function getSchemeFromExtension($extension) {
+  public function getSchemeForExtension($extension) {
 
     $extension_scheme = 'public';
 

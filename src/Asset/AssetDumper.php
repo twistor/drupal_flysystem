@@ -26,7 +26,7 @@ class AssetDumper extends DrupalAssetDumper {
     $filename = $file_extension. '_' . Crypt::hashBase64($data) . '.' . $file_extension;
     // Create the css/ or js/ path within the files folder.
 
-    $path = $this->getSchemeFromExtension($file_extension) . '://' . $file_extension;
+    $path = $this->getSchemeForExtension($file_extension) . '://' . $file_extension;
     $uri = $path . '/' . $filename;
     // Create the CSS or JS file.
     file_prepare_directory($path, FILE_CREATE_DIRECTORY);

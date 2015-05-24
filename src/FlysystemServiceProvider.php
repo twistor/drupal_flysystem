@@ -50,7 +50,7 @@ class FlysystemServiceProvider implements ServiceProviderInterface {
     }
 
     // Don't rewrite if there's nothing to change.
-    if ($this->getSchemeFromExtension($extension) === 'public') {
+    if ($this->getSchemeForExtension($extension) === 'public') {
       return;
     }
 
