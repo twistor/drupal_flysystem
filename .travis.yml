@@ -25,10 +25,10 @@ env:
     # see: https://github.com/drush-ops/drush#install---composer
     - PATH="$PATH:$HOME/.composer/vendor/bin"
 
-mysql:
-  database: drupal
-  username: root
-  encoding: utf8
+# mysql:
+#   database: drupal
+#   username: root
+#   encoding: utf8
 
 before_install:
   - composer self-update
@@ -40,9 +40,9 @@ install:
   - git clone --branch 8.0.x http://git.drupal.org/project/drupal.git
   - mv drupal_flysystem drupal/modules/flysystem
   - cd drupal
-  - drush --verbose site-install --db-url=mysql://root:@127.0.0.1/drupal --yes
+  # - drush --verbose site-install --db-url=mysql://root:@127.0.0.1/drupal --yes
   - drush dl composer_manager --destination=modules --dev
-  - drush en flysystem simpletest -y
+  # - drush en flysystem simpletest -y
 
 script:
   - php modules/composer_manager/scripts/init.sh
@@ -50,9 +50,9 @@ script:
   - composer drupal-rebuild
   - composer update --prefer-source
   - vendor/bin/phpunit --verbose --group Flysystem
-  - drush rs&
-  - sleep 5
-  - php scripts/run-tests.sh --url http://127.0.0.1:8888 --module flysystem --php /usr/bin/php
+  # - drush rs&
+  # - sleep 5
+  # - php scripts/run-tests.sh --url http://127.0.0.1:8888 --module flysystem --php /usr/bin/php
 
 after_script:
 
