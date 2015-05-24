@@ -27,4 +27,11 @@ class Null Implements FlysystemPluginInterface {
     return new NullAdapter();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function ensure($force = FALSE) {
+    return [];
+  }
+
 }

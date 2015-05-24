@@ -47,4 +47,12 @@ class Ftp implements FlysystemPluginInterface {
     return new FtpAdapter($this->configuration);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function ensure($force = FALSE) {
+    // @todo Check that the connection is valid.
+    return [];
+  }
+
 }

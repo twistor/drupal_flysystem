@@ -20,6 +20,8 @@ class NullTest extends \PHPUnit_Framework_TestCase {
   public function test() {
     $plugin = new Null([]);
     $this->assertInstanceOf('League\Flysystem\Adapter\NullAdapter', $plugin->getAdapter());
+    $this->assertTrue(is_array($plugin->ensure()));
+    $this->assertSame(0, count($plugin->ensure()));
   }
 
 }

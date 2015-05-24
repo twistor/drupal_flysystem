@@ -13,6 +13,7 @@ use Drupal\flysystem\DrupalFlysystemCache;
 use League\Flysystem\Cached\CachedAdapter;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Replicate\ReplicateAdapter;
+use Psr\Log\LoggerInterface;
 
 /**
  * A factory for flysystem filesystems.
@@ -48,6 +49,13 @@ class FlysystemFactory {
   protected $filesystems = [];
 
   /**
+   * The logger to use.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
    * The Flysystem plugin manager.
    *
    * @var \Drupal\Component\Plugin\PluginManagerInterface
@@ -77,10 +85,13 @@ class FlysystemFactory {
    *   The cache backend.
    * @param \Drupal\Core\Site\Settings $settings
    *   The system settings.
+   * @param \Psr\Log\LoggerInterface $logger
+   *   The logger.
    */
-  public function __construct(PluginManagerInterface $plugin_manager, CacheBackendInterface $cache, Settings $settings) {
+  public function __construct(PluginManagerInterface $plugin_manager, CacheBackendInterface $cache, Settings $settings, LoggerInterface $logger) {
     $this->pluginManager = $plugin_manager;
     $this->cacheBackend = $cache;
+    $this->logger = $logger;
     $this->settings = $settings->get('flysystem', []);
 
     // Apply defaults.
@@ -125,6 +136,30 @@ class FlysystemFactory {
     }
 
     return $this->plugins[$scheme];
+  }
+
+  /**
+   * Calls FlysystemPluginInterface::ensure() on each plugin.
+   *
+   * @param bool $force
+   *   (optional) Wheter to force the insurance. Defaults to false.
+   *
+   * @return array
+   *   Errors keyed by scheme.
+   */
+  public function ensure($force = FALSE) {
+    $errors = [];
+
+    foreach ($this->settings as $scheme => $configuration) {
+
+      foreach ($this->getPlugin($scheme)->ensure($force) as $error) {
+
+        $errors[$scheme][] = $error;
+        $this->logger->log($error['severity'], $error['message'], $error['context']);
+      }
+    }
+
+    return $errors;
   }
 
   /**

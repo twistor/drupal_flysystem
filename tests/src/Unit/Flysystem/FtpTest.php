@@ -20,6 +20,8 @@ class FtpTest extends \PHPUnit_Framework_TestCase {
   public function test() {
     $plugin = new Ftp([]);
     $this->assertInstanceOf('League\Flysystem\Adapter\Ftp', $plugin->getAdapter());
+    $this->assertTrue(is_array($plugin->ensure()));
+    $this->assertSame(0, count($plugin->ensure()));
   }
 
 }

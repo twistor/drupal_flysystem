@@ -1,11 +1,15 @@
 services:
+  logger.channel.flysystem:
+    parent: logger.channel_base
+    arguments: ['flysystem']
+
   plugin.manager.flysystem:
     class: Drupal\flysystem\Plugin\FlysystemPluginManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
 
   flysystem_factory:
     class: Drupal\flysystem\FlysystemFactory
-    arguments: ['@plugin.manager.flysystem', '@cache.default', '@settings']
+    arguments: ['@plugin.manager.flysystem', '@cache.default', '@settings', '@logger.channel.flysystem']
 
   path_processor.flysystem:
     class: Drupal\flysystem\PathProcessor\PathProcessorImageStyles

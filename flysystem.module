@@ -1,0 +1,22 @@
+<?php
+
+use Drupal\Core\Site\Settings;
+
+/**
+ * @file
+ * Provides access to various filesystem backends using Flysystem.
+ */
+
+/**
+ * Implements hook_cron().
+ */
+function flysystem_cron() {
+  \Drupal::service('flysystem_factory')->ensure();
+}
+
+/**
+ * Implements hook_rebuild().
+ */
+function flysystem_rebuild() {
+  \Drupal::service('flysystem_factory')->ensure();
+}

@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the flysystem module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function flysystem_requirements($phase) {
+  $requirements = [];
+
+  if ($phase !== 'runtime') {
+    return $requirements;
+  }
+
+  foreach (\Drupal::service('flysystem_factory')->ensure() as $scheme => $errors) {
+    foreach ($errors as $error) {
+      $requirements['flysystem:' . $scheme] = [
+        'title' => t('Flysystem: @scheme', ['@scheme' => $scheme]),
+        'description' => t($error['message'], $error['context']),
+        'severity' => REQUIREMENT_ERROR,
+      ];
+    }
+  }
+
+  return $requirements;
+}
+
+/**
+ * Implements hook_install().
+ */
+function flysystem_install() {
+  \Drupal::service('flysystem_factory')->ensure();
+}

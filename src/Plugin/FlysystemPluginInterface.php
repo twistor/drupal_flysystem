@@ -32,4 +32,14 @@ interface FlysystemPluginInterface {
    */
   public function getExternalUrl($uri);
 
+  /**
+   * Checks the sanity of the filesystem.
+   *
+   * If this is a local filesystem, .htaccess file should be in place.
+   *
+   * @return array
+   *   A list of error messages.
+   */
+  public function ensure($force = FALSE);
+
 }
