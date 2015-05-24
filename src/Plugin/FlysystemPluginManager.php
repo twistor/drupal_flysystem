@@ -55,6 +55,7 @@ class FlysystemPluginManager extends DefaultPluginManager implements FallbackPlu
         break;
       }
     }
+
     parent::alterDefinitions($definitions);
   }
 

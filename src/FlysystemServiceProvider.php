@@ -37,6 +37,8 @@ class FlysystemServiceProvider implements ServiceProviderInterface {
   /**
    * Swaps the js/css dumper if a scheme is configured to serve it.
    *
+   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
+   *   The container.
    * @param string $extension
    *   The file extension to swap.
    */

@@ -133,9 +133,7 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
       return [[
         'severity' => RfcLogLevel::ERROR,
         'message' => 'The %root directory either does not exist or is not readable and attempts to create it have failed.',
-        'context' => [
-          '%root' => $this->originalRoot,
-        ],
+        'context' => ['%root' => $this->originalRoot],
       ]];
     }
 

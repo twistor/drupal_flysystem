@@ -9,14 +9,13 @@ namespace Drupal\flysystem;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Site\Settings;
-use Drupal\flysystem\DrupalFlysystemCache;
 use League\Flysystem\Cached\CachedAdapter;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Replicate\ReplicateAdapter;
 use Psr\Log\LoggerInterface;
 
 /**
- * A factory for flysystem filesystems.
+ * A factory for Flysystem filesystems.
  */
 class FlysystemFactory {
 
@@ -63,14 +62,14 @@ class FlysystemFactory {
   protected $pluginManager;
 
   /**
-   * Create plugins.
+   * Created plugins.
    *
    * @var \Drupal\flysystem\Plugin\FlysystemPluginInterface[]
    */
   protected $plugins = [];
 
   /**
-   * Settings for the stream wrappers.
+   * Settings for stream wrappers.
    *
    * @var array
    */
@@ -130,9 +129,7 @@ class FlysystemFactory {
     if (!isset($this->plugins[$scheme])) {
       $settings = $this->getSettings($scheme);
 
-      $this->plugins[$scheme] = $this
-        ->pluginManager
-        ->createInstance($settings['type'], $settings['config']);
+      $this->plugins[$scheme] = $this->pluginManager->createInstance($settings['type'], $settings['config']);
     }
 
     return $this->plugins[$scheme];

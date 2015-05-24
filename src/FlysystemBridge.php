@@ -7,24 +7,13 @@
 
 namespace Drupal\flysystem;
 
-use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\Routing\UrlGeneratorTrait;
-use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Adapter\NullAdapter;
-use League\Flysystem\Cached\CachedAdapter;
-use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemInterface;
-use League\Flysystem\Replicate\ReplicateAdapter;
 use Twistor\FlysystemStreamWrapper;
 
 /**
  * An adapter for Flysystem to StreamWrapperInterface.
  */
 class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInterface {
-
-  use UrlGeneratorTrait;
 
   /**
    * {@inheritdoc}
@@ -111,9 +100,9 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    * @return \League\Flysystem\FilesystemInterface
    *   The filesystem for the scheme.
    */
-  public static function getFilesystemForScheme($scheme) {
+  protected function getFilesystemForScheme($scheme) {
     if (!isset(static::$filesystems[$scheme])) {
-      static::$filesystems[$scheme] = static::getFactory()->getFilesystem($scheme);
+      static::$filesystems[$scheme] = $this->getFactory()->getFilesystem($scheme);
       static::registerPlugins(static::$filesystems[$scheme]);
     }
 
@@ -137,7 +126,7 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    * @return \Drupal\flysystem\FlysystemFactory
    *   The Flysystem factory.
    */
-  protected static function getFactory() {
+  protected function getFactory() {
     return \Drupal::service('flysystem_factory');
   }
 

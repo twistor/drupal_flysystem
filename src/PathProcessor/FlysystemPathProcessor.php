@@ -28,7 +28,7 @@ class FlysystemPathProcessor implements InboundPathProcessorInterface {
     }
 
     // Stream wrapper protocols must conform to /^[a-zA-Z0-9+.-]+$/
-    // Via the php_stream_wrapper_scheme_validate() in the PHP source.
+    // Via php_stream_wrapper_scheme_validate() in the PHP source.
     if (!preg_match('|^_flysystem/([a-zA-Z0-9+.-]+)/|', $path, $matches)) {
       return $path;
     }

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Contains \Drupal\flysystem\Plugin\FlysystemPluginInterface.
+ */
+
 namespace Drupal\flysystem\Plugin;
 
 interface FlysystemPluginInterface {
@@ -12,7 +17,7 @@ interface FlysystemPluginInterface {
    * \Drupal\flysystem\FlysystemFactory injected.
    *
    * @return \League\Flysystem\AdapterInterface
-   *   The Flsysytem adapter.
+   *   The Flysytem adapter.
    */
   public function getAdapter();
 

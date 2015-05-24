@@ -7,8 +7,6 @@
 namespace Drupal\flysystem\Asset;
 
 use Drupal\Core\Asset\JsCollectionOptimizer as DrupalJsCollectionOptimizer;
-use Drupal\Core\State\StateInterface;
-
 
 /**
  * Optimizes JavaScript assets.

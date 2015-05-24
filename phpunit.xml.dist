@@ -4,23 +4,20 @@
   <php>
     <!-- Set error reporting to E_ALL. -->
     <ini name="error_reporting" value="32767"/>
-    <!-- Do not limit the amount of memory tests take to run. -->
-    <ini name="memory_limit" value="-1"/>
   </php>
   <testsuites>
-    <testsuite name="Feeds Unit Test Suite">
+    <testsuite name="Flysystem Unit Test Suite">
       <directory>./tests</directory>
     </testsuite>
   </testsuites>
   <listeners>
-    <listener class="\Drupal\Tests\Standards\DrupalStandardsListener">
+    <listener class="Drupal\Tests\Standards\DrupalStandardsListener">
     </listener>
   </listeners>
   <!-- Filter for coverage reports. -->
   <filter>
     <whitelist>
       <directory>./src</directory>
-      <!-- By definition test classes have no tests. -->
       <exclude>
         <directory suffix="Test.php">./</directory>
         <directory suffix="TestBase.php">./</directory>
@@ -30,6 +27,6 @@
   <logging>
     <log type="coverage-text" target="php://stdout" showUncoveredFiles="true"/>
     <log type="coverage-html" target="coverage" showUncoveredFiles="true"/>
-    <log type="coverage-clover" target="coverage.xml" showUncoveredFiles="true"/>
+    <!-- <log type="coverage-clover" target="coverage.xml" showUncoveredFiles="true"/> -->
   </logging>
 </phpunit>
