@@ -27,7 +27,7 @@ class FlysystemFactory {
    * @var array
    */
   protected $defaults = [
-    'type' => '',
+    'driver' => '',
     'config' => [],
     'replicate' => FALSE,
     'cache' => FALSE,
@@ -129,7 +129,7 @@ class FlysystemFactory {
     if (!isset($this->plugins[$scheme])) {
       $settings = $this->getSettings($scheme);
 
-      $this->plugins[$scheme] = $this->pluginManager->createInstance($settings['type'], $settings['config']);
+      $this->plugins[$scheme] = $this->pluginManager->createInstance($settings['driver'], $settings['config']);
     }
 
     return $this->plugins[$scheme];

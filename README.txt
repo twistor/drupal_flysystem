@@ -24,7 +24,7 @@ important.
 
 Stream wrappers are configured in settings.php. The keys (localexample) are the
 names of the stream wrappers. Can be used like 'localexample://filename.txt' The
-'type' key, is the type of adapter. Available adapters are:
+'driver' key, is the type of adapter. Available adapters are:
 
  - local
  - ftp (Requires the ftp extension)
@@ -41,7 +41,7 @@ Example configuration:
 $schemes = [
   'localexample' => [            // The name of the stream wrapper. localexample://
 
-    'type' => 'local',           // The plugin key.
+    'driver' => 'local',         // The plugin key.
 
     'config' => [
       'root' => '/path/to/dir',  // If 'root' is inside the public directory,
@@ -62,7 +62,7 @@ $schemes = [
   ],
 
   'ftpexample' => [
-    'type' => 'ftp',
+    'driver' => 'ftp',
     'config' => [
       'host' => 'ftp.example.com',
       'username' => 'username',

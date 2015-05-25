@@ -4,6 +4,7 @@
  * @file
  * Contains \Drupal\flysystem\SerializationStopperTrait.
  */
+
 namespace Drupal\flysystem;
 
 /**
