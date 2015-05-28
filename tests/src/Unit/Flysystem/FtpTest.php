@@ -18,6 +18,10 @@ use Drupal\flysystem\Flysystem\Ftp;
 class FtpTest extends \PHPUnit_Framework_TestCase {
 
   public function test() {
+    if (!defined('FTP_BINARY')) {
+      $this->markTestSkipped('The FTP_BINARY constant is not defined');
+    }
+
     $plugin = new Ftp([]);
     $this->assertInstanceOf('League\Flysystem\Adapter\Ftp', $plugin->getAdapter());
     $this->assertTrue(is_array($plugin->ensure()));
