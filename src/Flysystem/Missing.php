@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\flysystem\Flysystem\MissingPlugin.
+ * Contains \Drupal\flysystem\Flysystem\Missing.
  */
 
 namespace Drupal\flysystem\Flysystem;
@@ -15,7 +15,7 @@ use Drupal\flysystem\Plugin\FlysystemPluginInterface;
  *
  * @Adapter(id = "missing")
  */
-class MissingPlugin Implements FlysystemPluginInterface {
+class Missing Implements FlysystemPluginInterface {
 
   /**
    * {@inheritdoc}

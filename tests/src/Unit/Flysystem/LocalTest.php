@@ -80,7 +80,7 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
 
     // Can't autocreate dir because it's a file.
     $local = new Local(__DIR__, __FILE__);
-    $this->assertInstanceOf('League\Flysystem\Adapter\NullAdapter', $local->getAdapter());
+    $this->assertInstanceOf('Drupal\flysystem\Flysystem\Adapter\MissingAdapter', $local->getAdapter());
   }
 
   public function testGetExternalUrl() {
