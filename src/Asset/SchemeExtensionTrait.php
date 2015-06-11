@@ -28,7 +28,7 @@ trait SchemeExtensionTrait {
     $extension_scheme = 'public';
 
     foreach (Settings::get('flysystem', []) as $scheme => $configuration) {
-      if (!empty($configuration['serve_' . $extension])) {
+      if (!empty($configuration['serve_' . $extension]) && !empty($configuration['driver'])) {
         // Don't break, the last configured one will win.
         $extension_scheme = $scheme;
       }

@@ -28,6 +28,12 @@ class FlysystemServiceProvider implements ServiceProviderInterface {
     $this->swapDumper($container, 'css');
 
     foreach (Settings::get('flysystem', []) as $scheme => $settings) {
+
+      // Just some sanity checking, so things don't explode.
+      if (empty($settings['driver'])) {
+        continue;
+      }
+
       $container
         ->register('flysystem_stream_wrapper.' . $scheme, 'Drupal\flysystem\FlysystemBridge')
         ->addTag('stream_wrapper', ['scheme' => $scheme]);

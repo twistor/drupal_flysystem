@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\Tests\flysystem\Unit\FlysystemPathProcessorTest.
+ * Contains \Drupal\Tests\flysystem\Unit\PathProcessor\FlysystemPathProcessorTest.
  */
 
-namespace Drupal\Tests\flysystem\Unit;
+namespace Drupal\Tests\flysystem\Unit\PathProcessor;
 
 use Drupal\flysystem\PathProcessor\FlysystemPathProcessor;
 use Symfony\Component\HttpFoundation\Request;
