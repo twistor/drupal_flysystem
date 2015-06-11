@@ -34,13 +34,15 @@ class FlysystemPluginManagerTest extends \PHPUnit_Framework_TestCase {
 
     $definitions = [
       'test1' => ['extensions' => []],
-      'test2' => ['extensions' => ['missing_extension']],
+      'test2' => ['extensions' => ['pdo']],
+      'test3' => ['extensions' => ['missing_extension']],
     ];
 
     $method->invokeArgs($manager, [&$definitions]);
-    $this->assertSame(1, count($definitions));
+    $this->assertSame(2, count($definitions));
     $this->assertArrayHasKey('test1', $definitions);
-    $this->assertArrayNotHasKey('test2', $definitions);
+    $this->assertArrayHasKey('test2', $definitions);
+    $this->assertArrayNotHasKey('test3', $definitions);
   }
 
 }
