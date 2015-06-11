@@ -22,6 +22,7 @@ class FlysystemServiceProviderTest extends \PHPUnit_Framework_TestCase {
     $provider = new FlysystemServiceProvider();
 
     // Test that nothing fails when the container is empty.
+    new Settings([]);
     $provider->register($container);
 
     // Test that missing driver is skipped.
