@@ -159,7 +159,12 @@ class ConfigForm extends FormBase {
         return;
       }
 
-      $factory->getFilesystem($scheme_to)->putStream($filepath, $read_handle);
+      $success = $factory->getFilesystem($scheme_to)->putStream($filepath, $read_handle);
+
+      if (!$success) {
+        $args = ['%scheme' => $scheme_to, '%file' => $filepath];
+        $context['results']['errors'][] = ['The file %scheme://%file could not be saved.', $args];
+      }
     }
 
     // Catch all exceptions so we don't break batching. The types of exceptions
