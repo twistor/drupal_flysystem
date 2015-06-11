@@ -8,12 +8,16 @@
 namespace Drupal\flysystem;
 
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use League\Flysystem\Util;
 use Twistor\FlysystemStreamWrapper;
 
 /**
  * An adapter for Flysystem to StreamWrapperInterface.
  */
 class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInterface {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -26,14 +30,14 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    * {@inheritdoc}
    */
   public function getName() {
-    return t('Flysystem: @scheme', ['@scheme' => $this->getProtocol()]);
+    return $this->t('Flysystem: @scheme', ['@scheme' => $this->getProtocol()]);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDescription() {
-    return t('Flysystem: @scheme', ['@scheme' => $this->getProtocol()]);
+    return $this->t('Flysystem: @scheme', ['@scheme' => $this->getProtocol()]);
   }
 
   /**
@@ -76,19 +80,8 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
     }
 
     list($scheme, $target) = explode('://', $uri, 2);
-    // If there's no scheme, assume a regular directory path.
-    if (!isset($target)) {
-      $target = $scheme;
-      $scheme = NULL;
-    }
 
-    $dirname = ltrim(dirname($target), '\/');
-
-    if ($dirname === '.') {
-      $dirname = '';
-    }
-
-    return isset($scheme) ? $scheme . '://' . $dirname : $dirname;
+    return $scheme . '://' . ltrim(Util::dirname($target), '\/');
   }
 
   /**
