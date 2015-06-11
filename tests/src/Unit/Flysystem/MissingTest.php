@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Tests\flysystem\Unit\Flysystem\MissingTest.
+ * Contains \NoDrupal\Tests\flysystem\Unit\Flysystem\MissingTest.
  */
 
 namespace NoDrupal\Tests\flysystem\Unit\Flysystem;
@@ -11,7 +11,7 @@ use Drupal\flysystem\Flysystem\Missing;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\Flysystem\Missing
- * @group Flysystem
+ * @group flysystem
  */
 class MissingTest extends \PHPUnit_Framework_TestCase {
 

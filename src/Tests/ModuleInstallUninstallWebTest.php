@@ -12,7 +12,7 @@ use Drupal\simpletest\WebTestBase;
 /**
  * Tests module installation and uninstallation.
  *
- * @group Flysystem
+ * @group flysystem
  */
 class ModuleInstallUninstallWebTest extends WebTestBase {
 

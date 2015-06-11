@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Tests\flysystem\Unit\Flysystem\Adapter\MissingAdapterTest.
+ * Contains \NoDrupal\Tests\flysystem\Unit\Flysystem\Adapter\MissingAdapterTest.
  */
 
 namespace NoDrupal\Tests\flysystem\Unit\Flysystem\Adapter;
@@ -12,7 +12,7 @@ use League\Flysystem\Config;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\Flysystem\Adapter\MissingAdapter
- * @group Flysystem
+ * @group flysystem
  */
 class MissingAdapterTest extends \PHPUnit_Framework_TestCase {
 

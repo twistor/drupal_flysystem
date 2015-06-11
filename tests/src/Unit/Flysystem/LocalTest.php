@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Tests\flysystem\Unit\Flysystem\LocalTest.
+ * Contains \NoDrupal\Tests\flysystem\Unit\Flysystem\LocalTest.
  */
 
 namespace NoDrupal\Tests\flysystem\Unit\Flysystem;
@@ -17,7 +17,7 @@ use Prophecy\Argument;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\Flysystem\Local
- * @group Flysystem
+ * @group flysystem
  */
 class LocalTest extends \PHPUnit_Framework_TestCase {
 

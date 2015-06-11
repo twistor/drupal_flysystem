@@ -2,16 +2,16 @@
 
 /**
  * @file
- * Contains \NoDrupal\Tests\flysystem\Unit\Asset\SchemeExtensionTraitTest.
+ * Contains \Drupal\Tests\flysystem\Unit\Asset\SchemeExtensionTraitTest.
  */
 
-namespace NoDrupal\Tests\flysystem\Unit\Asset;
+namespace Drupal\Tests\flysystem\Unit\Asset;
 
 use Drupal\Core\Site\Settings;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\Asset\SchemeExtensionTrait
- * @group Flysystem
+ * @group flysystem
  */
 class SchemeExtensionTraitTest extends \PHPUnit_Framework_TestCase {
 

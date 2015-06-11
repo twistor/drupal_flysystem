@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\Tests\flysystem\Unit\Flysystem\FtpTest.
+ * Contains \NoDrupal\Tests\flysystem\Unit\Flysystem\FtpTest.
  */
 
 namespace NoDrupal\Tests\flysystem\Unit\Flysystem {
@@ -11,7 +11,7 @@ use Drupal\flysystem\Flysystem\Ftp;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\Flysystem\Ftp
- * @group Flysystem
+ * @group flysystem
  */
 class FtpTest extends \PHPUnit_Framework_TestCase {
 
