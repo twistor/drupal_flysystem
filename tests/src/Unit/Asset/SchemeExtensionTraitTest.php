@@ -10,10 +10,8 @@ namespace NoDrupal\Tests\flysystem\Unit\Asset;
 use Drupal\Core\Site\Settings;
 
 /**
- * Tests for \Drupal\flysystem\Asset\SchemeExtensionTrait.
- *
+ * @coversDefaultClass \Drupal\flysystem\Asset\SchemeExtensionTrait
  * @group Flysystem
- * @covers \Drupal\flysystem\Asset\SchemeExtensionTrait
  */
 class SchemeExtensionTraitTest extends \PHPUnit_Framework_TestCase {
 

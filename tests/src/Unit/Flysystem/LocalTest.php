@@ -16,10 +16,8 @@ use League\Flysystem\Filesystem;
 use Prophecy\Argument;
 
 /**
- * Tests for \Drupal\flysystem\Flysystem\Local.
- *
+ * @coversDefaultClass \Drupal\flysystem\Flysystem\Local
  * @group Flysystem
- * @covers \Drupal\flysystem\Flysystem\Local
  */
 class LocalTest extends \PHPUnit_Framework_TestCase {
 
