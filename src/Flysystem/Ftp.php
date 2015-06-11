@@ -7,6 +7,8 @@
 
 namespace Drupal\flysystem\Flysystem;
 
+use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\flysystem\Flysystem\Adapter\MissingAdapter;
 use Drupal\flysystem\Plugin\FlysystemPluginInterface;
 use Drupal\flysystem\Plugin\FlysystemUrlTrait;
 use League\Flysystem\Adapter\Ftp as FtpAdapter;
@@ -38,21 +40,45 @@ class Ftp implements FlysystemPluginInterface {
    */
   public function __construct(array $configuration) {
     $this->configuration = $configuration;
+
+    if (empty($this->configuration['host'])) {
+      $this->configuration['host'] = '127.0.0.1';
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function getAdapter() {
-    return new FtpAdapter($this->configuration);
+    try {
+      $adapter = new FtpAdapter($this->configuration);
+      $adapter->connect();
+    }
+
+    catch (\RuntimeException $e) {
+      // A problem connecting to the server.
+      $adapter = new MissingAdapter();
+    }
+
+    return $adapter;
   }
 
   /**
    * {@inheritdoc}
    */
   public function ensure($force = FALSE) {
-    // @todo Check that the connection is valid.
-    return [];
+    if ($this->getAdapter() instanceof FtpAdapter) {
+      return [];
+    }
+
+    return [[
+      'severity' => RfcLogLevel::ERROR,
+      'message' => 'There was an error connecting to the FTP server %host:%port.',
+      'context' => [
+        '%host' => $this->configuration['host'],
+        '%port' => isset($this->configuration['port']) ? $this->configuration['port'] : 21,
+      ],
+    ]];
   }
 
 }
