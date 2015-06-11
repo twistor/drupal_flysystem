@@ -11,10 +11,10 @@ use Drupal\Component\PhpStorage\FileStorage;
 use Drupal\Core\File\FileSystem;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\flysystem\Flysystem\Adapter\MissingAdapter;
 use Drupal\flysystem\Plugin\FlysystemPluginInterface;
 use Drupal\flysystem\Plugin\FlysystemUrlTrait;
 use League\Flysystem\Adapter\Local as LocalAdapter;
-use League\Flysystem\Adapter\NullAdapter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -109,7 +109,7 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
       return new LocalAdapter($this->root);
     }
 
-    return new NullAdapter();
+    return new MissingAdapter();
   }
 
   /**
