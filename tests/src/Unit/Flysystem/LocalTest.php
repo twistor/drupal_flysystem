@@ -48,6 +48,9 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     $filesystem->deleteDir('flysystem2');
   }
 
+  /**
+   * @covers \Drupal\flysystem\Flysystem\Local
+   */
   public function testCreate() {
     $kernel = $this->prophesize('Drupal\Core\DrupalKernelInterface');
     $kernel->getSitePath()->willReturn('');
@@ -64,6 +67,9 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     $this->assertInstanceOf('Drupal\flysystem\Plugin\FlysystemPluginInterface', $plugin);
   }
 
+  /**
+   * @covers \Drupal\flysystem\Flysystem\Local
+   */
   public function testGetAdapter() {
     $local = new Local(__DIR__, $this->one);
     $this->assertInstanceOf('League\Flysystem\Adapter\Local', $local->getAdapter());
@@ -81,6 +87,9 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     $this->assertInstanceOf('Drupal\flysystem\Flysystem\Adapter\MissingAdapter', $local->getAdapter());
   }
 
+  /**
+   * @covers \Drupal\flysystem\Flysystem\Local
+   */
   public function testGetExternalUrl() {
     // Public and root are different.
     $local = $this->getLocalPlugin($this->one, __DIR__, TRUE);
@@ -107,6 +116,9 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     $this->assertSame('serve', $local->getExternalUrl('test://file.txt'));
   }
 
+  /**
+   * @covers \Drupal\flysystem\Flysystem\Local
+   */
   public function testEnsure() {
     // Invalid root.
     $local = new Local($this->one, __FILE__);
