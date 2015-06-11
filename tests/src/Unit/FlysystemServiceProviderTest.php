@@ -46,7 +46,7 @@ class FlysystemServiceProviderTest extends \PHPUnit_Framework_TestCase {
     $this->assertSame('Drupal\Core\Asset\AssetDumper', $container->getDefinition('asset.js.dumper')->getClass());
     $this->assertSame('Drupal\Core\Asset\JsCollectionOptimizer', $container->getDefinition('asset.js.collection_optimizer')->getClass());
 
-    // A
+    // A successful swap.
     new Settings(['flysystem' => ['testscheme' => ['driver' => 'whatever', 'serve_js' => TRUE]]]);
     $provider->register($container);
     $this->assertSame('Drupal\flysystem\Asset\AssetDumper', $container->getDefinition('asset.js.dumper')->getClass());
