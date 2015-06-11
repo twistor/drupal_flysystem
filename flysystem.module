@@ -28,7 +28,7 @@ function flysystem_file_download($uri) {
   $schemes = Settings::get('flysystem', []);
   $scheme = Drupal::service('file_system')->uriScheme($uri);
 
-  if (!isset($schemes[$scheme])) {
+  if (!$scheme || !isset($schemes[$scheme])) {
     return;
   }
 

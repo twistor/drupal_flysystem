@@ -1,0 +1,4 @@
+administer flysystem:
+  title: 'Administer Flysystem'
+  description: 'Sync Flysystem filesystems.'
+  restrict access: 'TRUE'

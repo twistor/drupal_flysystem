@@ -1,0 +1,9 @@
+system.file_system_settings:
+  route_name: system.file_system_settings
+  base_route: system.file_system_settings
+  title: Settings
+
+flysystem.config:
+  route_name: flysystem.config
+  base_route: system.file_system_settings
+  title: Flysystem
