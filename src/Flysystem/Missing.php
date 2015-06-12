@@ -7,6 +7,7 @@
 
 namespace Drupal\flysystem\Flysystem;
 
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\flysystem\Flysystem\Adapter\MissingAdapter;
 use Drupal\flysystem\Plugin\FlysystemPluginInterface;
 
@@ -35,9 +36,11 @@ class Missing Implements FlysystemPluginInterface {
    * {@inheritdoc}
    */
   public function ensure($force = FALSE) {
-    // Should we do some kind of reporting here, since if this is used, that
-    // means another plugin is missing?
-    return [];
+    return [[
+      'severity' => RfcLogLevel::ERROR,
+      'message' => 'The Flysystem driver is missing.',
+      'context' => [],
+    ]];
   }
 
 }

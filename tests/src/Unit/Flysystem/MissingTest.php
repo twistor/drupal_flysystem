@@ -19,7 +19,7 @@ class MissingTest extends \PHPUnit_Framework_TestCase {
     $plugin = new Missing([]);
     $this->assertInstanceOf('Drupal\flysystem\Flysystem\Adapter\MissingAdapter', $plugin->getAdapter());
     $this->assertTrue(is_array($plugin->ensure()));
-    $this->assertSame(0, count($plugin->ensure()));
+    $this->assertSame(1, count($plugin->ensure()));
     $this->assertSame('', $plugin->getExternalUrl('asdf'));
   }
 

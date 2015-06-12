@@ -11,6 +11,7 @@
 
   "require-dev": {
     "drupal/core": "8.0.*@dev",
+    "mikey179/vfsStream": "^1.1.0",
     "phpunit/phpunit": "4.6.*"
   },
 
