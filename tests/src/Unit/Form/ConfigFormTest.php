@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\Tests\flysystem\Unit\Form\ConfigFormTest.
+ * Contains \NoDrupal\Tests\flysystem\Unit\Form\ConfigFormTest.
  */
 
-namespace Drupal\Tests\flysystem\Unit\Form {
+namespace NoDrupal\Tests\flysystem\Unit\Form {
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormState;
