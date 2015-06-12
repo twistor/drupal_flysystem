@@ -13,7 +13,7 @@ use Drupal\Core\Asset\AssetDumper as DrupalAssetDumper;
 /**
  * Flysystem dependency injection container.
  *
- * @@codeCoverageIgnore
+ * @codeCoverageIgnore
  */
 class AssetDumper extends DrupalAssetDumper {
 

@@ -28,8 +28,8 @@ class CssCollectionOptimizerTest extends UnitTestCase {
       define('REQUEST_TIME', time());
     }
 
-    vfsStream::setup('css');
-    file_put_contents('vfs://css/test.css', 'asdfasdf');
+    vfsStream::setup('flysystem');
+    file_put_contents('vfs://flysystem/test.js', 'asdfasdf');
 
     $container = new ContainerBuilder();
     $container->set('config.factory', $this->getConfigFactoryStub([
@@ -46,7 +46,7 @@ class CssCollectionOptimizerTest extends UnitTestCase {
     $optimizer = new CssCollectionOptimizer($grouper->reveal(), $optimizer, $dumper, $state);
 
     $optimizer->deleteAll();
-    $this->assertFalse(file_exists('vfs://css/test.css'));
+    $this->assertFalse(file_exists('vfs://flysystem/test.js'));
   }
 
 }
@@ -55,8 +55,7 @@ class CssCollectionOptimizerTest extends UnitTestCase {
 namespace {
   if (!function_exists('file_scan_directory')) {
     function file_scan_directory($dir, $mask, array $options) {
-      $dir = strpos($dir, 'css') !== FALSE ? 'css' : 'js';
-      $options['callback']('vfs://' . $dir . '/test.' . $dir);
+      $options['callback']('vfs://flysystem/test.js');
     }
   }
 
