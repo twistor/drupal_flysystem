@@ -50,10 +50,6 @@ script:
   - composer update --prefer-source
   - cd ../modules/flysystem
   - ../../core/vendor/bin/phpunit
-  - cd ../../core
-  - composer update --prefer-source --prefer-lowest
-  - cd ../modules/flysystem
-  - ../../core/vendor/bin/phpunit
 
 after_script:
 
