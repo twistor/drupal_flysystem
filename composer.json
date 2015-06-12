@@ -6,7 +6,7 @@
     "league/flysystem-cached-adapter": "~1.0",
     "league/flysystem-replicate-adapter": "~1.0",
     "twistor/flysystem-memory-adapter": "~1.0",
-    "twistor/flysystem-stream-wrapper": "^1.0.2"
+    "twistor/flysystem-stream-wrapper": "^1.0.5"
   },
 
   "require-dev": {

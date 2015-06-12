@@ -105,7 +105,6 @@ class ConfigFormTest extends UnitTestCase {
 
     $this->form->submitForm($form, $form_state);
     $batch = batch_set();
-    $this->assertInternalType('array', $batch);
     $this->assertSame('Drupal\flysystem\Form\ConfigForm::finishBatch', $batch['finished']);
     $this->assertSame(0, count($batch['operations']));
 
@@ -118,11 +117,10 @@ class ConfigFormTest extends UnitTestCase {
     $form_state->setValue('sync_from', 'from_files');
 
     $this->form->submitForm($form, $form_state);
-    $batch = batch_set();
 
     $batch_files = array_map(function (array $operation) {
       return $operation[1][2];
-    }, $batch['operations']);
+    }, batch_set()['operations']);
 
     $this->assertSame(['dir/test.txt', 'test.txt'], $batch_files);
 
@@ -131,11 +129,10 @@ class ConfigFormTest extends UnitTestCase {
     $form_state->setValue('sync_to', 'from_files');
 
     $this->form->submitForm($form, $form_state);
-    $batch = batch_set();
 
     $batch_files = array_map(function (array $operation) {
       return $operation[1][2];
-    }, $batch['operations']);
+    }, batch_set()['operations']);
 
     $this->assertSame(['dir/test.txt', 'test.txt'], $batch_files);
   }
