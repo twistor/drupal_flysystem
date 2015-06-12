@@ -78,11 +78,16 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
     $this->directoryPerm = $directory_permission;
     // ensureDirectory() sets the created flag.
     $this->root = $this->ensureDirectory($root);
+
+    if (!$this->root) {
+      return;
+    }
+
     $this->publicPath = $is_public && $this->pathIsPublic($public_filepath, $this->root);
 
     // If the directory was recently created, write the .htaccess file.
     if ($this->created && !$this->publicPath) {
-      $this->writeHtaccess($this->root, TRUE);
+      $this->writeHtaccess($this->root);
     }
   }
 
@@ -173,11 +178,11 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
     }
 
     if (!file_exists($directory)) {
-      @mkdir($directory, $this->directoryPerm, TRUE);
+      mkdir($directory, $this->directoryPerm, TRUE);
     }
 
-    if (is_dir($directory) && @chmod($directory, $this->directoryPerm)) {
-      clearstatcache($directory);
+    if (is_dir($directory) && chmod($directory, $this->directoryPerm)) {
+      clearstatcache(TRUE, $directory);
       $this->created = TRUE;
       return realpath($directory);
     }
@@ -225,10 +230,6 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
    */
   protected function pathIsPublic($public_filepath, $root) {
     $public = realpath($public_filepath);
-
-    if ($public === FALSE || $root === FALSE) {
-      return FALSE;
-    }
 
     // The same directory.
     if ($public === $root) {

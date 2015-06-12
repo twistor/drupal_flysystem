@@ -28,8 +28,10 @@ class FtpTest extends \PHPUnit_Framework_TestCase {
     // Test broken connection behavior.
     $plugin = new Ftp([]);
     $this->assertInstanceOf('Drupal\flysystem\Flysystem\Adapter\MissingAdapter', $plugin->getAdapter());
-    $this->assertTrue(is_array($plugin->ensure()));
-    $this->assertSame(1, count($plugin->ensure()));
+    $result = $plugin->ensure();
+    $this->assertTrue(is_array($result));
+    $this->assertSame(1, count($result));
+    $this->assertSame(21, $result[0]['context']['%port']);
   }
 
 }

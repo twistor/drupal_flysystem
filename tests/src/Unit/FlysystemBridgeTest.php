@@ -35,7 +35,7 @@ class FlysystemBridgeTest extends UnitTestCase {
     $this->assertSame('Flysystem: testscheme', $bridge->getDescription());
     $this->assertFalse($bridge->realpath());
     $this->assertSame('testscheme://', $bridge->dirname());
-    $this->assertSame('testscheme://dir', $bridge->dirname('testscheme:///dir/file.txt'));
+    $this->assertSame('testscheme://dir://dir', $bridge->dirname('testscheme:///dir://dir/file.txt'));
 
     $factory = $this->prophesize('Drupal\flysystem\FlysystemFactory');
     $factory->getPlugin('testscheme')->willReturn(new Missing());

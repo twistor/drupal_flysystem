@@ -33,6 +33,7 @@ class DrupalFlysystemCacheTest extends \PHPUnit_Framework_TestCase {
 
     $cache->load();
     $this->assertTrue($cache->has('test.txt'));
+    $this->assertFalse($cache->has('missing.txt'));
   }
 
 }

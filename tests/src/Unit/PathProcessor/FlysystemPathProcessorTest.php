@@ -34,8 +34,8 @@ class FlysystemPathProcessorTest extends \PHPUnit_Framework_TestCase {
 
     // Test system download from sub-dir.
     $request = new Request();
-    $this->assertSame('system/files/scheme', $processor->processInbound('_flysystem/scheme/dir/file.txt', $request));
-    $this->assertSame('dir/file.txt', $request->query->get('file'));
+    $this->assertSame('system/files/scheme', $processor->processInbound('_flysystem/scheme/a/b/c/file.txt', $request));
+    $this->assertSame('a/b/c/file.txt', $request->query->get('file'));
     $this->assertSame('scheme', $request->attributes->get('scheme'));
   }
 

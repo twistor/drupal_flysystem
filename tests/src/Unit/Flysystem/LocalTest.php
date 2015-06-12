@@ -26,26 +26,21 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
   protected $urlGenerator;
 
   public function setUp() {
-    $filesystem = new Filesystem(new LocalAdapter(__DIR__));
-    $filesystem->deleteDir('flysystem');
-    $filesystem->deleteDir('flysystem2');
-
     $this->one = __DIR__ . '/flysystem';
     $this->two = __DIR__ . '/flysystem2';
+    $this->cleanUpFiles();
 
     mkdir($this->one);
     mkdir($this->two);
 
     $url_generator = $this->prophesize('Drupal\Core\Routing\UrlGenerator');
     $url_generator->generateFromRoute(Argument::cetera())->willReturn('download');
-    $url_generator->generateFromPath(Argument::cetera())->willReturn('serve');
+    $url_generator->generateFromPath(Argument::type('string'), ['absolute' => TRUE])->willReturn('serve');
     $this->UrlGenerator = $url_generator->reveal();
   }
 
   public function tearDown() {
-    $filesystem = new Filesystem(new LocalAdapter(__DIR__));
-    $filesystem->deleteDir('flysystem');
-    $filesystem->deleteDir('flysystem2');
+    $this->cleanUpFiles();
   }
 
   /**
@@ -82,6 +77,11 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     $this->assertSame(040777, stat(__DIR__ . '/flysystem/sub')['mode']);
     $this->assertHtaccessFile(__DIR__ . '/flysystem/sub/.htaccess');
 
+    // Test that directory perm is set if not readable.
+    chmod(__DIR__ . '/flysystem/sub', 0111);
+    $local = new Local($this->one, __DIR__ . '/flysystem/sub', FALSE, 0777);
+    $this->assertSame(040777, stat(__DIR__ . '/flysystem/sub')['mode']);
+
     // Can't autocreate dir because it's a file.
     $local = new Local(__DIR__, __FILE__);
     $this->assertInstanceOf('Drupal\flysystem\Flysystem\Adapter\MissingAdapter', $local->getAdapter());
@@ -94,10 +94,12 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     // Public and root are different.
     $local = $this->getLocalPlugin($this->one, __DIR__, TRUE);
     $this->assertSame('download', $local->getExternalUrl('test://file.txt'));
+    $this->assertFileNotExists(__DIR__ . '/.htaccess');
 
     // Edge case.
     $local = $this->getLocalPlugin($this->one, $this->two, TRUE);
     $this->assertSame('download', $local->getExternalUrl('test://file.txt'));
+    $this->assertFileNotExists($this->two . '/.htaccess');
 
     // Public is invalid.
     $local = $this->getLocalPlugin('asdfasdf', $this->two, TRUE);
@@ -106,14 +108,17 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     // Public and root are the same.
     $local = $this->getLocalPlugin(__DIR__, __DIR__, TRUE);
     $this->assertSame('serve', $local->getExternalUrl('test://file.txt'));
+    $this->assertFileNotExists(__DIR__ . '/.htaccess');
 
     // Public and root are the same, but public is false.
     $local = $this->getLocalPlugin(__DIR__, __DIR__, FALSE);
     $this->assertSame('download', $local->getExternalUrl('test://file.txt'));
+    $this->assertFileNotExists(__DIR__ . '/.htaccess');
 
     // Root is inside public.
     $local = $this->getLocalPlugin(__DIR__, $this->one, TRUE);
     $this->assertSame('serve', $local->getExternalUrl('test://file.txt'));
+    $this->assertFileNotExists($this->one . '/.htaccess');
   }
 
   /**
@@ -130,6 +135,11 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     $this->assertSame(0, count($local->ensure()));
     $this->assertFileNotExists($this->one . '/.htaccess');
 
+    // Make sure mkdir is recursive.
+    $local = new Local($this->one, $this->one . '/sub/deepersub', FALSE);
+    $this->assertSame(0, count($local->ensure()));
+    $this->assertHtaccessFile($this->one . '/sub/deepersub/.htaccess');
+
     // Write .htaccess.
     $local = new Local($this->one, $this->one, FALSE);
     $this->assertSame(0, count($local->ensure()));
@@ -139,7 +149,7 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     $this->assertSame(0, count($local->ensure()));
     $this->assertHtaccessFile($this->one . '/.htaccess');
 
-    // Test fhat overwriting works.
+    // Test that overwriting works.
     chmod($this->one . '/.htaccess', 0777);
     file_put_contents($this->one . '/.htaccess', 'asjkhasdjsd');
 
@@ -163,6 +173,29 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     $this->assertFileExists($file);
     $this->assertSame(FileStorage::htaccessLines(), file_get_contents($file));
     $this->assertSame(0100444, stat($file)['mode']);
+  }
+
+  protected function cleanUpFiles() {
+    $filesystem = new Filesystem(new LocalAdapter(__DIR__));
+
+    $dirs = [
+      $this->one,
+      $this->two,
+      $this->one . '/sub',
+      $this->one . '/sub/deepersub',
+    ];
+
+    foreach ($dirs as $dir) {
+      if (is_dir($dir)) {
+        chmod($dir, 0777);
+      }
+  }
+
+    $filesystem->deleteDir('flysystem');
+    $filesystem->deleteDir('flysystem2');
+    if ($filesystem->has('.htaccess')) {
+      $filesystem->delete('.htaccess');
+    }
   }
 
   protected function getLocalPlugin($public_path, $root, $is_public = FALSE, $directory_permission = 0775) {

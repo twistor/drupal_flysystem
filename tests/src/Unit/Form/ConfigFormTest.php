@@ -70,6 +70,9 @@ class ConfigFormTest extends UnitTestCase {
   public function testBuildForm() {
     $form = $this->form->buildForm([], new FormState());
     $this->assertSame(4, count($form));
+
+    $this->assertTrue($form['sync_from']['#required']);
+    $this->assertTrue($form['sync_to']['#required']);
   }
 
   /**
@@ -151,6 +154,7 @@ class ConfigFormTest extends UnitTestCase {
 
     $this->assertSame('abcdefg', $this->factory->reveal()->getFilesystem('to_empty')->read('dir/test.txt'));
     $this->assertTrue(empty($context['results']));
+    $this->assertSame(1, $context['finished']);
   }
 
   /**
@@ -240,8 +244,10 @@ namespace {
   }
 
   if (!function_exists('drupal_set_time_limit')) {
-    function drupal_set_time_limit() {
-
+    function drupal_set_time_limit($limit) {
+      if ($limit !== 0) {
+        throw new \Exception();
+      }
     }
   }
 
