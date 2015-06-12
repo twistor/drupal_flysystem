@@ -224,7 +224,7 @@ class ConfigFormTest extends UnitTestCase {
 }
 
 namespace {
-  if (!function_exists('drupal_set_messge')) {
+  if (!function_exists('drupal_set_message')) {
     function drupal_set_message() {}
   }
 
