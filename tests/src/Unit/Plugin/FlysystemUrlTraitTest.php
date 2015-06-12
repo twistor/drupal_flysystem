@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\Tests\flysystem\Unit\Plugin\FlysystemUrlTraitTest.
+ * Contains \NoDrupal\Tests\flysystem\Unit\Plugin\FlysystemUrlTraitTest.
  */
 
-namespace Drupal\Tests\flysystem\Unit\Plugin;
+namespace NoDrupal\Tests\flysystem\Unit\Plugin;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\Plugin\FlysystemUrlTrait
