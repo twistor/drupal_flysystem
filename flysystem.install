@@ -19,8 +19,8 @@ function flysystem_requirements($phase) {
   foreach (\Drupal::service('flysystem_factory')->ensure() as $scheme => $errors) {
     foreach ($errors as $error) {
       $requirements['flysystem:' . $scheme] = [
-        'title' => t('Flysystem: @scheme', ['@scheme' => $scheme]),
-        'description' => t($error['message'], $error['context']),
+        'title' => \Drupal::translation()->translate('Flysystem: @scheme', ['@scheme' => $scheme]),
+        'description' => \Drupal::translation()->translate($error['message'], $error['context']),
         'severity' => REQUIREMENT_ERROR,
       ];
     }

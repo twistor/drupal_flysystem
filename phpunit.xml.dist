@@ -17,10 +17,13 @@
   <!-- Filter for coverage reports. -->
   <filter>
     <whitelist>
-      <directory>./src</directory>
+      <directory>./</directory>
+      <directory suffix=".module">./</directory>
+      <directory suffix=".install">./</directory>
       <exclude>
         <directory suffix="Test.php">./</directory>
         <directory suffix="TestBase.php">./</directory>
+        <directory suffix="bootstrap.php">./</directory>
       </exclude>
     </whitelist>
   </filter>

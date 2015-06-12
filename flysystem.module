@@ -1,11 +1,11 @@
 <?php
 
-use Drupal\Core\Site\Settings;
-
 /**
  * @file
  * Provides access to various filesystem backends using Flysystem.
  */
+
+use Drupal\Core\Site\Settings;
 
 /**
  * Implements hook_cron().
