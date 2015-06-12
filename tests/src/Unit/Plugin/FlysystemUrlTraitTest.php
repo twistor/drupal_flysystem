@@ -7,11 +7,6 @@
 
 namespace Drupal\Tests\flysystem\Unit\Plugin;
 
-use Drupal\Core\Cache\NullBackend;
-use Drupal\Core\Site\Settings;
-use Drupal\flysystem\FlysystemUrlTrait;
-use League\Flysystem\Adapter\NullAdapter;
-
 /**
  * @coversDefaultClass \Drupal\flysystem\Plugin\FlysystemUrlTrait
  * @group flysystem

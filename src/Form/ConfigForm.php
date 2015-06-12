@@ -141,7 +141,7 @@ class ConfigForm extends FormBase {
    *   The batch context.
    */
   public static function copyFile($scheme_from, $scheme_to, $filepath, array &$context) {
-    $context['message'] = t('Copying: %file', ['%file' => $filepath]);
+    $context['message'] = \Drupal::translation()->translate('Copying: %file', ['%file' => $filepath]);
     $context['finished'] = 1;
 
     $factory = \Drupal::service('flysystem_factory');
@@ -184,23 +184,23 @@ class ConfigForm extends FormBase {
   /**
    * Finish batch.
    */
-  public static function finishBatch($success, $results, $operations) {
+  public static function finishBatch($success, array $results, array $operations) {
     if (!$success) {
       // An error occurred.
       // $operations contains the operations that remained unprocessed.
       $args = ['%file' => reset($operations)[2]];
-      drupal_set_message(t('An error occurred while syncing: %file', $args), 'error');
+      drupal_set_message(\Drupal::translation()->translate('An error occurred while syncing: %file', $args), 'error');
       return;
     }
 
     if (empty($results['errors'])) {
-      drupal_set_message(t('File synchronization finished successfully.'));
+      drupal_set_message(\Drupal::translation()->translate('File synchronization finished successfully.'));
       return;
     }
 
     foreach ($results['errors'] as $error) {
       if (is_array($error)) {
-        drupal_set_message(t($error[0], $error[1]), 'error', TRUE);
+        drupal_set_message(\Drupal::translation()->translate($error[0], $error[1]), 'error', TRUE);
         \Drupal::logger('flysystem')->error($error[0], $error[1]);
       }
       else {
@@ -208,7 +208,7 @@ class ConfigForm extends FormBase {
       }
     }
 
-    drupal_set_message(t('File synchronization experienced errors.'), 'warning');
+    drupal_set_message(\Drupal::translation()->translate('File synchronization experienced errors.'), 'warning');
   }
 
   /**
