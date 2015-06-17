@@ -54,7 +54,7 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
    *
    * @var string|false
    */
-  protected $publicPath;
+  protected $publicPath = FALSE;
 
   /**
    * The root of the local adapter.
@@ -72,21 +72,23 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
    *   The of the adapter's filesystem.
    * @param bool $is_public
    *   (optional) Whether this is a public file system. Defaults to false.
+   * @param int $directory_permission
+   *   (optional) The permissions to create directories with.
    */
   public function __construct($public_filepath, $root, $is_public = FALSE, $directory_permission = FileSystem::CHMOD_DIRECTORY) {
     $this->originalRoot = $root;
     $this->directoryPerm = $directory_permission;
     // ensureDirectory() sets the created flag.
-    $this->root = $this->ensureDirectory($root);
-
-    if (!$this->root) {
+    if (!$this->root = $this->ensureDirectory($root)) {
       return;
     }
 
-    $this->publicPath = $is_public && $this->pathIsPublic($public_filepath, $this->root);
+    if ($is_public) {
+      $this->publicPath = $this->pathIsPublic($public_filepath, $this->root);
+    }
 
     // If the directory was recently created, write the .htaccess file.
-    if ($this->created && !$this->publicPath) {
+    if ($this->created && $this->publicPath === FALSE) {
       $this->writeHtaccess($this->root);
     }
   }
@@ -101,7 +103,7 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
     return new static(
       $settings->get('file_public_path', $default),
       $configuration['root'],
-      empty($configuration['public']),
+      !empty($configuration['public']),
       $settings->get('file_chmod_directory', FileSystem::CHMOD_DIRECTORY)
     );
   }
@@ -121,7 +123,7 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
    * {@inheritdoc}
    */
   public function getExternalUrl($uri) {
-    if (!$this->publicPath) {
+    if ($this->publicPath === FALSE) {
       return $this->getDownloadlUrl($uri);
     }
 
@@ -142,11 +144,7 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
       ]];
     }
 
-    if ($this->publicPath) {
-      return [];
-    }
-
-    if ($this->writeHtaccess($this->root, $force)) {
+    if ($this->publicPath !== FALSE || $this->writeHtaccess($this->root, $force)) {
       return [];
     }
 
@@ -169,22 +167,22 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
    *   The directory.
    *
    * @return string|false
-   *   The realpath() of the directory, or false on failure.
+   *   The path of the directory, or false on failure.
    */
   protected function ensureDirectory($directory) {
     // Go for the success case first.
     if (is_dir($directory) && is_readable($directory)) {
-      return realpath($directory);
+      return $directory;
     }
 
     if (!file_exists($directory)) {
-      mkdir($directory, $this->directoryPerm, TRUE);
+      $success = mkdir($directory, $this->directoryPerm, TRUE);
     }
 
     if (is_dir($directory) && chmod($directory, $this->directoryPerm)) {
       clearstatcache(TRUE, $directory);
       $this->created = TRUE;
-      return realpath($directory);
+      return $directory;
     }
 
     return FALSE;
@@ -229,21 +227,14 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
    *   The public path, or false.
    */
   protected function pathIsPublic($public_filepath, $root) {
-    $public = realpath($public_filepath);
+    $root = realpath($root);
 
-    // The same directory.
-    if ($public === $root) {
-      return $public_filepath;
-    }
-
-    if (strpos($root, $public) !== 0) {
+    if (!$public = realpath($public_filepath)) {
       return FALSE;
     }
 
-    $subpath = substr($root, strlen($public));
-
-    if ($subpath && $subpath[0] === DIRECTORY_SEPARATOR) {
-      return $public_filepath . '/' . ltrim($subpath, DIRECTORY_SEPARATOR);
+    if (strpos($root . DIRECTORY_SEPARATOR, $public . DIRECTORY_SEPARATOR) === 0) {
+      return $public_filepath . substr($root, strlen($public));
     }
 
     return FALSE;
