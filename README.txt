@@ -6,12 +6,16 @@ Flysystem
 - PHP 5.4 or greater
 - The mbstring extension. (http://php.net/manual/en/book.mbstring.php)
 - Composer (https://getcomposer.org)
-- Composer manager (https://www.drupal.org/project/composer_manager)
+- (optional) Composer manager (https://www.drupal.org/project/composer_manager)
+  If you have a different method of managing Composer dependencies, use that.
 
 ## INSTALLATION ##
 
 These are the steps you need to take in order to use this software. Order is
 important.
+
+Note: If you're not using composer_manager, then use whatever you normally use
+to manage dependencies, and just install this module.
 
  1. Download and install composer_manager.
  2. Download flysystem.
@@ -23,8 +27,8 @@ important.
 ## CONFIGURATION ##
 
 Stream wrappers are configured in settings.php. The keys (localexample) are the
-names of the stream wrappers. Can be used like 'localexample://filename.txt' The
-'driver' key, is the type of adapter. Available adapters are:
+names of the stream wrappers. For example: 'localexample://filename.txt'
+The 'driver' key, is the type of adapter. Available adapters are:
 
  - local
  - ftp (Requires the ftp extension)
