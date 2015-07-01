@@ -30,10 +30,10 @@ env:
 #   encoding: utf8
 
 before_install:
-  - composer self-update
+  - travis_retry composer self-update
 
 install:
-  - composer global require drush/drush:dev-master
+  - travis_retry composer global require drush/drush:dev-master
   - phpenv rehash
   - cd ..
   - git clone --branch 8.0.x http://git.drupal.org/project/drupal.git
@@ -47,7 +47,7 @@ script:
   - php modules/composer_manager/scripts/init.sh
   - cd core
   - composer drupal-rebuild
-  - composer update --prefer-source
+  - travis_retry composer update --prefer-source
   - cd ../modules/flysystem
   - ../../core/vendor/bin/phpunit
 
