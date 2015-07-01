@@ -12,9 +12,9 @@ use Drupal\Core\Form\FormState;
 use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\Form\ConfigForm;
 use League\Flysystem\Filesystem;
+use League\Flysystem\Memory\MemoryAdapter;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Twistor\Flysystem\MemoryAdapter;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\Form\ConfigForm
@@ -22,10 +22,23 @@ use Twistor\Flysystem\MemoryAdapter;
  */
 class ConfigFormTest extends UnitTestCase {
 
+  /**
+   * The Flysystem factory prophecy.
+   *
+   * @var \Prophecy\Prophecy\ObjectProphecy
+   */
   protected $factory;
 
+  /**
+   * The form object.
+   *
+   * @var \Drupal\flysystem\Form\ConfigForm
+   */
   protected $form;
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
 
@@ -35,6 +48,7 @@ class ConfigFormTest extends UnitTestCase {
 
     $this->form = new ConfigForm($this->factory->reveal());
     $this->form->setStringTranslation($this->getStringTranslationStub());
+
     $container = new ContainerBuilder();
     $container->set('string_translation', $this->getStringTranslationStub());
     $container->set('flysystem_factory', $this->factory->reveal());
@@ -214,6 +228,15 @@ class ConfigFormTest extends UnitTestCase {
     ConfigForm::finishBatch(TRUE, ['errors' => ['first error', ['second error', ['']]]], []);
   }
 
+  /**
+   * Converts a file list fron Flysystem into a list of files.
+   *
+   * @param array $list
+   *   The file list from Flysystem::listContents().
+   *
+   * @return string[]
+   *   A list of file paths.
+   */
   protected function getFileList(array $list) {
     $list = array_filter($list, function (array $file) {
       return $file['type'] === 'file';

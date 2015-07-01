@@ -18,6 +18,9 @@ use League\Flysystem\Adapter\NullAdapter;
  */
 class FlysystemFactoryTest extends \PHPUnit_Framework_TestCase {
 
+  /**
+   * @covers \Drupal\flysystem\FlysystemFactory
+   */
   public function test() {
     $cache = new NullBackend('bin');
     $logger = $this->getMock('Psr\Log\LoggerInterface');

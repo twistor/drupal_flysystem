@@ -17,8 +17,16 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class InstallFunctionsTest extends UnitTestCase {
 
+  /**
+   * The Flysystem factory prophecy object.
+   *
+   * @var \Prophecy\Prophecy\ObjectProphecy
+   */
   protected $factory;
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
     require_once dirname(dirname(dirname(__DIR__))) . '/flysystem.install';
@@ -32,6 +40,9 @@ class InstallFunctionsTest extends UnitTestCase {
     \Drupal::setContainer($container);
   }
 
+  /**
+   * Tests flysystem_requirements().
+   */
   public function testFlysystemRequirements() {
     if (!defined('REQUIREMENT_ERROR')) {
       define('REQUIREMENT_ERROR', 2);
@@ -53,6 +64,9 @@ class InstallFunctionsTest extends UnitTestCase {
     $this->assertSame('Test message', $return['flysystem:testscheme']['description']);
   }
 
+  /**
+   * Tests flysystem_install().
+   */
   public function testFlysystemInstall() {
     $this->factory->ensure()->shouldBeCalled();
     flysystem_install();

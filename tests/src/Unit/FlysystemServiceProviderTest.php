@@ -17,6 +17,9 @@ use Drupal\flysystem\FlysystemServiceProvider;
  */
 class FlysystemServiceProviderTest extends \PHPUnit_Framework_TestCase {
 
+  /**
+   * @covers \Drupal\flysystem\FlysystemServiceProvider
+   */
   public function test() {
     $container = new ContainerBuilder();
     $provider = new FlysystemServiceProvider();

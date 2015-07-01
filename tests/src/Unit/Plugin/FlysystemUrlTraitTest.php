@@ -14,7 +14,9 @@ namespace NoDrupal\Tests\flysystem\Unit\Plugin;
 class FlysystemUrlTraitTest extends \PHPUnit_Framework_TestCase {
 
   /**
-   * @covers \Drupal\flysystem\Plugin\FlysystemUrlTrait
+   * @covers ::getExternalUrl
+   * @covers ::getScheme
+   * @covers ::getTarget
    */
   public function testGetExternalUrl() {
     $trait = $this->getMockForTrait('Drupal\flysystem\Plugin\FlysystemUrlTrait');

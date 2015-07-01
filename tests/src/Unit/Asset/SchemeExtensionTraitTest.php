@@ -15,6 +15,9 @@ use Drupal\Core\Site\Settings;
  */
 class SchemeExtensionTraitTest extends \PHPUnit_Framework_TestCase {
 
+  /**
+   * @covers ::getSchemeForExtension
+   */
   public function test() {
     new Settings(['flysystem' => [
       'local' => ['serve_js' => TRUE, 'driver' => 'asdf'],

@@ -15,6 +15,9 @@ use Drupal\flysystem\Flysystem\Ftp;
  */
 class FtpTest extends \PHPUnit_Framework_TestCase {
 
+  /**
+   * @covers \Drupal\flysystem\Flysystem\Ftp
+   */
   public function test() {
     if (!defined('FTP_BINARY')) {
       $this->markTestSkipped('The FTP_BINARY constant is not defined.');
@@ -47,7 +50,7 @@ function ftp_chdir() {
 }
 
 /**
- * Stubs ftp_connect().
+ * Stubs ftp_close().
  */
 function ftp_close() {
 }
@@ -67,7 +70,7 @@ function ftp_login() {
 }
 
 /**
- * Stubs ftp_connect().
+ * Stubs ftp_pasv().
  */
 function ftp_pasv() {
   return TRUE;

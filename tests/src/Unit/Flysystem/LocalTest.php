@@ -21,10 +21,30 @@ use Prophecy\Argument;
  */
 class LocalTest extends \PHPUnit_Framework_TestCase {
 
+  /**
+   * The first directory path.
+   *
+   * @var string
+   */
   protected $one;
+
+  /**
+   * The second test directory path.
+   *
+   * @var string
+   */
   protected $two;
+
+  /**
+   * The test Url generator.
+   *
+   * @var \Drupal\Core\Routing\UrlGenerator
+   */
   protected $urlGenerator;
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     $this->one = __DIR__ . '/flysystem';
     $this->two = __DIR__ . '/flysystem2';
@@ -41,12 +61,16 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     $this->UrlGenerator = $url_generator->reveal();
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function tearDown() {
     $this->cleanUpFiles();
   }
 
   /**
-   * @covers \Drupal\flysystem\Flysystem\Local
+   * @covers ::create
+   * @covers ::__construct
    */
   public function testCreate() {
     $kernel = $this->prophesize('Drupal\Core\DrupalKernelInterface');
@@ -65,7 +89,7 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
-   * @covers \Drupal\flysystem\Flysystem\Local
+   * @covers ::getAdapter
    */
   public function testGetAdapter() {
     $local = new Local(__DIR__, $this->one);
@@ -90,7 +114,8 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
-   * @covers \Drupal\flysystem\Flysystem\Local
+   * @covers ::getExternalUrl
+   * @covers ::pathIsPublic
    */
   public function testGetExternalUrl() {
     // Public and root are different.
@@ -124,7 +149,12 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
-   * @covers \Drupal\flysystem\Flysystem\Local
+   * @covers ::ensure
+   * @covers ::ensureDirectory
+   * @covers ::writeHtaccess
+   * @covers ::__construct
+   *
+   * @todo Clean this up.
    */
   public function testEnsure() {
     // Invalid root.
@@ -171,12 +201,21 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     chmod($this->one, 0777);
   }
 
+  /**
+   * Asserts that the .htaccess file exists and has the correct contents.
+   *
+   * @param string $file
+   *   The path to the .htaccess file.
+   */
   protected function assertHtaccessFile($file) {
     $this->assertFileExists($file);
     $this->assertSame(FileStorage::htaccessLines(), file_get_contents($file));
     $this->assertSame(0100444, stat($file)['mode']);
   }
 
+  /**
+   * Removes test files.
+   */
   protected function cleanUpFiles() {
     $filesystem = new Filesystem(new LocalAdapter(__DIR__));
 
@@ -200,6 +239,21 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     }
   }
 
+  /**
+   * Returns a new Local plugin instance.
+   *
+   * @param string $public_path
+   *   The public path.
+   * @param string $root
+   *   The root path.
+   * @param bool $is_public
+   *   Whether this plugin should be public.
+   * @param int $directory_permission
+   *   The directory permission.
+   *
+   * @return \Drupal\flysystem\Flysystem\Local
+   *   A new local plugin.
+   */
   protected function getLocalPlugin($public_path, $root, $is_public = FALSE, $directory_permission = 0775) {
     $local = new Local($public_path, $root, $is_public, $directory_permission);
     $local->setUrlGenerator($this->UrlGenerator);

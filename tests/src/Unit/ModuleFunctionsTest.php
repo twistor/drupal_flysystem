@@ -20,8 +20,16 @@ use org\bovigo\vfs\vfsStream;
  */
 class ModuleFunctionsTest extends UnitTestCase {
 
+  /**
+   * The Flysystem factory prophecy object.
+   *
+   * @var \Prophecy\Prophecy\ObjectProphecy
+   */
   protected $factory;
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
     vfsStream::setup('module_file');
@@ -47,16 +55,25 @@ class ModuleFunctionsTest extends UnitTestCase {
     \Drupal::setContainer($container);
   }
 
+  /**
+   * Tests flysystem_cron().
+   */
   public function testFlysystemCron() {
     $this->factory->ensure()->shouldBeCalled();
     flysystem_cron();
   }
 
+  /**
+   * Tests flysystem_rebuild().
+   */
   public function testFlysystemRebuild() {
     $this->factory->ensure()->shouldBeCalled();
     flysystem_rebuild();
   }
 
+  /**
+   * Tests flysystem_file_download().
+   */
   public function testFlysystemFileDownload() {
     new Settings(['flysystem' => []]);
 
@@ -71,7 +88,6 @@ class ModuleFunctionsTest extends UnitTestCase {
     $this->assertSame(2, count($return));
     $this->assertSame('txt/flysystem', $return['Content-Type']);
     $this->assertSame(4, $return['Content-Length']);
-
   }
 
 }

@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class FlysystemBridgeTest extends UnitTestCase {
 
+  /**
+   * @covers \Drupal\flysystem\FlysystemBridge
+   */
   public function testDrupalMethods() {
     $this->assertSame(StreamWrapperInterface::WRITE_VISIBLE, FlysystemBridge::getType());
 

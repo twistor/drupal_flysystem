@@ -16,6 +16,9 @@ use Drupal\flysystem\DrupalFlysystemCache;
  */
 class DrupalFlysystemCacheTest extends \PHPUnit_Framework_TestCase {
 
+  /**
+   * @covers \Drupal\flysystem\DrupalFlysystemCache
+   */
   public function test() {
     $backend = new MemoryBackend('test');
     $cache = new DrupalFlysystemCache($backend, 'flysystem');

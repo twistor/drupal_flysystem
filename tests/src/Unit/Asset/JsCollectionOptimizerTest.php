@@ -22,6 +22,9 @@ use org\bovigo\vfs\vfsStream;
  */
 class JsCollectionOptimizerTest extends UnitTestCase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
 
@@ -35,6 +38,9 @@ class JsCollectionOptimizerTest extends UnitTestCase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function tearDown() {
 
     if (file_exists('vfs://flysystem/test.js')) {

@@ -14,6 +14,8 @@ namespace Drupal\Tests\flysystem\Unit;
 class SerializationStopperTraitTest extends \PHPUnit_Framework_TestCase {
 
   /**
+   * @covers ::__sleep
+   *
    * @expectedException \LogicException
    * @expectedExceptionMessage can not be serialized.
    */

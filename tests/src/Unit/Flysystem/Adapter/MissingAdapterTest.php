@@ -16,6 +16,9 @@ use League\Flysystem\Config;
  */
 class MissingAdapterTest extends \PHPUnit_Framework_TestCase {
 
+  /**
+   * @covers \Drupal\flysystem\Flysystem\Adapter\MissingAdapter
+   */
   public function test() {
     $adapter = new MissingAdapter();
 
