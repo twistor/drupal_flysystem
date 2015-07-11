@@ -19,40 +19,23 @@ matrix:
     - php: 7.0
   fast_finish: true
 
-env:
-  global:
-    # add composer's global bin directory to the path
-    # see: https://github.com/drush-ops/drush#install---composer
-    - PATH="$PATH:$HOME/.composer/vendor/bin"
-
-# mysql:
-#   database: drupal
-#   username: root
-#   encoding: utf8
-
-before_install:
-  - travis_retry composer self-update
-
 install:
-  - travis_retry composer global require drush/drush:dev-master
-  - phpenv rehash
   - cd ..
   - git clone --branch 8.0.x http://git.drupal.org/project/drupal.git
   - mv drupal_flysystem drupal/modules/flysystem
   - cd drupal
-  # - drush --verbose site-install --db-url=mysql://root:@127.0.0.1/drupal --yes
-  - drush dl composer_manager --destination=modules --dev
-  # - drush en flysystem simpletest -y
 
 script:
-  - php modules/composer_manager/scripts/init.sh
   - cd core
-  - composer drupal-rebuild
-  - travis_retry composer update --prefer-source
+
+  - travis_retry composer require league/flysystem ^1.0.3 --prefer-source
+  - travis_retry composer require league/flysystem-cached-adapter ~1.0 --prefer-source
+  - travis_retry composer require league/flysystem-memory ~1.0 --prefer-source
+  - travis_retry composer require league/flysystem-replicate-adapter ~1.0 --prefer-source
+  - travis_retry composer require twistor/flysystem-stream-wrapper ^1.0.5 --prefer-source
+
   - cd ../modules/flysystem
   - ../../core/vendor/bin/phpunit
-
-after_script:
 
 notifications:
   email: false

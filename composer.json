@@ -4,13 +4,13 @@
   "require": {
     "league/flysystem": "^1.0.3",
     "league/flysystem-cached-adapter": "~1.0",
-    "league/flysystem-memory": "~1.0",
     "league/flysystem-replicate-adapter": "~1.0",
     "twistor/flysystem-stream-wrapper": "^1.0.5"
   },
 
   "require-dev": {
     "drupal/core": "8.0.*@dev",
+    "league/flysystem-memory": "~1.0",
     "phpunit/phpunit": "4.6.*"
   },
 
