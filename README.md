@@ -1,10 +1,12 @@
-Flysystem
-=========
+Flysystem for Drupal
+====================
+
+[Flysystem](http://flysystem.thephpleague.com/) is a filesystem abstraction
+which allows you to easily swap out a local filesystem for a remote one.
+Reducing technical debt and chance of vendor lock-in.
 
 ## REQUIREMENTS ##
 
-- PHP 5.4 or greater
-- The mbstring extension. (http://php.net/manual/en/book.mbstring.php)
 - Composer (https://getcomposer.org)
 - (optional) Composer manager (https://www.drupal.org/project/composer_manager)
   If you have a different method of managing Composer dependencies, use that.
@@ -17,12 +19,22 @@ important.
 Note: If you're not using composer_manager, then use whatever you normally use
 to manage dependencies, and just install this module.
 
- 1. Download and install composer_manager.
+ 1. Download composer_manager.
  2. Download flysystem.
- 3. cd into the core/ directory
- 4. # composer drupal-rebuild && composer update
+ 3. Initialize composer_manager:
+ 4. Move into the core/ directory.
  5. Install Flysystem.
  6. Enjoy.
+
+Steps performed from the root of the Drupal install. Module locations may vary.
+
+```bash
+drush dl composer_manager && flysystem
+php modules/composer_manager/scripts/init.sh
+cd core/
+composer drupal-rebuild && composer update
+drush en flysystem -y
+```
 
 ## CONFIGURATION ##
 
@@ -38,10 +50,11 @@ The 'driver' key, is the type of adapter. Available adapters are:
  - sftp (https://www.drupal.org/project/flysystem_sftp)
  - zip (https://www.drupal.org/project/flysystem_zip)
 
-The 'config' key is the settings that will be passed into the Flysystem adapter.
+The 'config' is the configuration passed into the Flysystem adapter.
 
 Example configuration:
 
+```php
 $schemes = [
   'localexample' => [            // The name of the stream wrapper. localexample://
 
@@ -87,3 +100,4 @@ $schemes = [
 
 // Don't forget this!
 $settings['flysystem'] = $schemes;
+```
