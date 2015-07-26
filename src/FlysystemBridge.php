@@ -97,6 +97,7 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
     if (!isset(static::$filesystems[$scheme])) {
       static::$filesystems[$scheme] = $this->getFactory()->getFilesystem($scheme);
       static::$config[$scheme] = static::$defaultConfiguration;
+      static::$config[$scheme]['permissions']['dir']['public'] = 0777;
       static::registerPlugins($scheme, static::$filesystems[$scheme]);
     }
 
