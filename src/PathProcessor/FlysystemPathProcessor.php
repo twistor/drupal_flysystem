@@ -23,13 +23,13 @@ class FlysystemPathProcessor implements InboundPathProcessorInterface {
    */
   public function processInbound($path, Request $request) {
     // Quick exit.
-    if (strpos($path, '_flysystem/') !== 0) {
+    if (strpos($path, '/_flysystem/') !== 0) {
       return $path;
     }
 
     // Stream wrapper protocols must conform to /^[a-zA-Z0-9+.-]+$/
     // Via php_stream_wrapper_scheme_validate() in the PHP source.
-    if (!preg_match('|^_flysystem/([a-zA-Z0-9+.-]+)/|', $path, $matches)) {
+    if (!preg_match('|^/_flysystem/([a-zA-Z0-9+.-]+)/|', $path, $matches)) {
       return $path;
     }
 
@@ -38,15 +38,13 @@ class FlysystemPathProcessor implements InboundPathProcessorInterface {
     // Support image styles.
     // @see PathProcessorImageStyles::processInbound()
     if (strpos($rest, 'styles/') === 0 && substr_count($rest, '/') >= 3) {
-      return 'system/files/' . $rest;
+      return '/system/files/' . $rest;
     }
 
     // Routes to FileDownloadController::download().
     $request->query->set('file', $rest);
-    // It really feels like I shouldn't have to set this.
-    $request->attributes->set('scheme', $matches[1]);
 
-    return 'system/files/' . $matches[1];
+    return $path;
   }
 
 }
