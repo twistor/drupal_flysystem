@@ -48,8 +48,13 @@ class InstallFunctionsTest extends UnitTestCase {
       define('REQUIREMENT_ERROR', 2);
     }
 
-    $return = flysystem_requirements('install');
+    $dependencies_exist = (int) class_exists('League\Flysystem\Filesystem');
+
+    $return = flysystem_requirements('update');
     $this->assertSame(0, count($return));
+
+    $return = flysystem_requirements('install');
+    $this->assertSame(1 - $dependencies_exist, count($return));
 
     $this->factory->ensure()->willReturn([
       'testscheme' => [[
@@ -60,7 +65,7 @@ class InstallFunctionsTest extends UnitTestCase {
 
     $return = flysystem_requirements('runtime');
 
-    $this->assertSame(1, count($return));
+    $this->assertSame(2 - $dependencies_exist, count($return));
     $this->assertSame('Test message', $return['flysystem:testscheme']['description']);
   }
 

@@ -11,6 +11,31 @@
 function flysystem_requirements($phase) {
   $requirements = [];
 
+  if ($phase !== 'runtime' && $phase !== 'install') {
+    return $requirements;
+  }
+
+  $dependencies = [
+    'League\Flysystem\Filesystem' => \Drupal::translation()->translate('Flysystem'),
+    'League\Flysystem\Cached\CachedAdapter' => \Drupal::translation()->translate('cache adapter'),
+    'League\Flysystem\Replicate\ReplicateAdapter' => \Drupal::translation()->translate('replicate adapter'),
+    'Twistor\FlysystemStreamWrapper' => \Drupal::translation()->translate('stream wrapper'),
+  ];
+
+  $missing = array_filter(array_map(function ($dependency) use ($dependencies) {
+    return class_exists($dependency) ? FALSE : $dependencies[$dependency];
+  }, array_keys($dependencies)));
+
+  // @codeCoverageIgnoreStart
+  if ($missing) {
+    $requirements['flysystem_dependencies'] = [
+      'title' => \Drupal::translation()->translate('Flysystem'),
+      'description' => \Drupal::translation()->translate('Dependencies missing: @deps.', ['@deps' => implode(', ', $missing)]),
+      'severity' => REQUIREMENT_ERROR,
+    ];
+  }
+  // @codeCoverageIgnoreEnd
+
   if ($phase !== 'runtime') {
     return $requirements;
   }
