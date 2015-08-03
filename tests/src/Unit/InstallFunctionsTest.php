@@ -7,6 +7,7 @@
 
 namespace Drupal\Tests\flysystem\Unit;
 
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -60,6 +61,7 @@ class InstallFunctionsTest extends UnitTestCase {
       'testscheme' => [[
         'message' => 'Test message',
         'context' => [],
+        'severity' => RfcLogLevel::ERROR,
       ]],
     ]);
 

@@ -5,6 +5,8 @@
  * Install, update and uninstall functions for the flysystem module.
  */
 
+use Drupal\flysystem\Logger\Convert;
+
 /**
  * Implements hook_requirements().
  */
@@ -46,7 +48,7 @@ function flysystem_requirements($phase) {
       $requirements['flysystem:' . $scheme] = [
         'title' => \Drupal::translation()->translate('Flysystem: @scheme', ['@scheme' => $scheme]),
         'description' => \Drupal::translation()->translate($error['message'], $error['context']),
-        'severity' => REQUIREMENT_ERROR,
+        'severity' => Convert::rfcToHookRequirements($error['severity']),
       ];
     }
   }

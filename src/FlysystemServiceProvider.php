@@ -62,9 +62,11 @@ class FlysystemServiceProvider implements ServiceProviderInterface {
       return;
     }
 
-    $container->getDefinition('asset.' . $extension . '.dumper')
+    $container
+      ->getDefinition('asset.' . $extension . '.dumper')
       ->setClass('Drupal\flysystem\Asset\AssetDumper');
-    $container->getDefinition('asset.' . $extension . '.collection_optimizer')
+    $container
+      ->getDefinition('asset.' . $extension . '.collection_optimizer')
       ->setClass('Drupal\flysystem\Asset\\' . ucfirst($extension) . 'CollectionOptimizer');
   }
 
