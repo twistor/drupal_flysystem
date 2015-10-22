@@ -8,6 +8,7 @@
 namespace Drupal\flysystem\Flysystem;
 
 use Drupal\Component\PhpStorage\FileStorage;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\File\FileSystem;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -129,7 +130,7 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
 
     $path = str_replace('\\', '/', $this->publicPath . '/' . $this->getTarget($uri));
 
-    return $this->getUrlGenerator()->generateFromPath($path, ['absolute' => TRUE]);
+    return $GLOBALS['base_url'] . '/' . UrlHelper::encodePath($path);
   }
 
   /**

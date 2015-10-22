@@ -55,9 +55,6 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
 
     $url_generator = $this->prophesize('Drupal\Core\Routing\UrlGenerator');
     $url_generator->generateFromRoute(Argument::cetera())->willReturn('download');
-    $url_generator->generateFromPath(Argument::type('string'), ['absolute' => TRUE])->will(function ($args) {
-      return $args[0];
-    });
     $this->UrlGenerator = $url_generator->reveal();
   }
 
@@ -118,6 +115,7 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
    * @covers ::pathIsPublic
    */
   public function testGetExternalUrl() {
+    $GLOBALS['base_url'] = 'http://example.com';
     // Public and root are different.
     $local = $this->getLocalPlugin($this->one, __DIR__, TRUE);
     $this->assertSame('download', $local->getExternalUrl('test://file.txt'));
@@ -134,7 +132,7 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
 
     // Public and root are the same.
     $local = $this->getLocalPlugin(__DIR__, __DIR__, TRUE);
-    $this->assertSame(__DIR__ . '/file.txt', $local->getExternalUrl('test://file.txt'));
+    $this->assertSame('http://example.com/' . __DIR__ . '/file.txt', $local->getExternalUrl('test://file.txt'));
     $this->assertFileNotExists(__DIR__ . '/.htaccess');
 
     // Public and root are the same, but public is false.
@@ -144,7 +142,7 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
 
     // Root is inside public.
     $local = $this->getLocalPlugin(__DIR__, $this->one, TRUE);
-    $this->assertSame($this->one . '/file.txt', $local->getExternalUrl('test://file.txt'));
+    $this->assertSame('http://example.com/' . $this->one . '/file.txt', $local->getExternalUrl('test://file.txt'));
     $this->assertFileNotExists($this->one . '/.htaccess');
   }
 
