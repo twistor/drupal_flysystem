@@ -68,7 +68,7 @@ class InstallFunctionsTest extends UnitTestCase {
     $return = flysystem_requirements('runtime');
 
     $this->assertSame(2 - $dependencies_exist, count($return));
-    $this->assertSame('Test message', $return['flysystem:testscheme']['description']);
+    $this->assertSame('Test message', (string) $return['flysystem:testscheme']['description']);
   }
 
   /**

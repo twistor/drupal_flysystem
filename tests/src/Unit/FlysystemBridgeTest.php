@@ -34,8 +34,8 @@ class FlysystemBridgeTest extends UnitTestCase {
     $bridge->setUri($uri);
     $this->assertSame('testscheme://file.txt', $bridge->getUri($uri));
 
-    $this->assertSame('Flysystem: testscheme', $bridge->getName());
-    $this->assertSame('Flysystem: testscheme', $bridge->getDescription());
+    $this->assertSame('Flysystem: testscheme', (string) $bridge->getName());
+    $this->assertSame('Flysystem: testscheme', (string) $bridge->getDescription());
     $this->assertFalse($bridge->realpath());
     $this->assertSame('testscheme://', $bridge->dirname());
     $this->assertSame('testscheme://dir://dir', $bridge->dirname('testscheme:///dir://dir/file.txt'));

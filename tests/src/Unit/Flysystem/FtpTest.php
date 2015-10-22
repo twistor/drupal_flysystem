@@ -83,4 +83,11 @@ function ftp_pwd() {
   return '';
 }
 
+/**
+ * Stubs ftp_systype().
+ */
+function ftp_systype() {
+  return TRUE;
+}
+
 }
