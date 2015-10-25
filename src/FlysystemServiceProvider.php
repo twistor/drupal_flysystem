@@ -37,6 +37,14 @@ class FlysystemServiceProvider implements ServiceProviderInterface {
       $container
         ->register('flysystem_stream_wrapper.' . $scheme, 'Drupal\flysystem\FlysystemBridge')
         ->addTag('stream_wrapper', ['scheme' => $scheme]);
+
+      // Register the path processors for local files.
+      if ($settings['driver'] === 'local' && !empty($settings['config']['public'])) {
+        $container
+          ->register('flysystem.' . $scheme . '.path_processor', 'Drupal\flysystem\PathProcessor\LocalPathProcessor')
+          ->addTag('path_processor_inbound', ['priority' => 400])
+          ->addArgument($scheme);
+      }
     }
   }
 

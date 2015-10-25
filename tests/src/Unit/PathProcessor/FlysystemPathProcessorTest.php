@@ -23,17 +23,19 @@ class FlysystemPathProcessorTest extends \PHPUnit_Framework_TestCase {
     $this->assertSame('/_flysystem/scheme', $processor->processInbound('/_flysystem/scheme', $request));
 
     // Test image style.
-    $this->assertSame('/system/files/styles/scheme/small/image.jpg', $processor->processInbound('/_flysystem/scheme/styles/scheme/small/image.jpg', $request));
-    $this->assertSame('/system/files/styles/scheme/small/dir/image.jpg', $processor->processInbound('/_flysystem/scheme/styles/scheme/small/dir/image.jpg', $request));
+    $this->assertSame('/_flysystem/styles/scheme/small', $processor->processInbound('/_flysystem/scheme/styles/scheme/small/image.jpg', $request));
+    $this->assertSame($request->query->get('file'), 'image.jpg');
+    $this->assertSame('/_flysystem/styles/scheme/small', $processor->processInbound('/_flysystem/scheme/styles/scheme/small/dir/image.jpg', $request));
+    $this->assertSame($request->query->get('file'), 'dir/image.jpg');
 
     // Test system download.
     $request = new Request();
-    $this->assertSame('/_flysystem/scheme/file.txt', $processor->processInbound('/_flysystem/scheme/file.txt', $request));
+    $this->assertSame('/_flysystem/scheme', $processor->processInbound('/_flysystem/scheme/file.txt', $request));
     $this->assertSame('file.txt', $request->query->get('file'));
 
     // Test system download from sub-dir.
     $request = new Request();
-    $this->assertSame('/_flysystem/scheme/a/b/c/file.txt', $processor->processInbound('/_flysystem/scheme/a/b/c/file.txt', $request));
+    $this->assertSame('/_flysystem/scheme', $processor->processInbound('/_flysystem/scheme/a/b/c/file.txt', $request));
     $this->assertSame('a/b/c/file.txt', $request->query->get('file'));
   }
 

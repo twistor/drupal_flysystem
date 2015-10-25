@@ -1,3 +1,11 @@
+flysystem.files:
+  path: '/_flysystem/{scheme}'
+  defaults:
+    _controller: 'Drupal\system\FileDownloadController::download'
+  requirements:
+    _access: 'TRUE'
+    scheme: '^[a-zA-Z0-9+.-]+$'
+
 flysystem.serve:
   path: '/_flysystem/{scheme}/{filepath}'
   defaults:
@@ -14,3 +22,6 @@ flysystem.config:
     _title: Flysystem
   requirements:
     _permission: 'administer flysystem'
+
+route_callbacks:
+  - 'Drupal\flysystem\Routing\FlysystemRoutes::routes'

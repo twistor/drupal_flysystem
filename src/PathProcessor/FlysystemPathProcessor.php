@@ -36,15 +36,19 @@ class FlysystemPathProcessor implements InboundPathProcessorInterface {
     $rest = substr($path, strlen($matches[0]));
 
     // Support image styles.
-    // @see PathProcessorImageStyles::processInbound()
     if (strpos($rest, 'styles/') === 0 && substr_count($rest, '/') >= 3) {
-      return '/system/files/' . $rest;
+      list(, $image_style, $scheme, $file) = explode('/', $rest, 4);
+
+      // Set the file as query parameter.
+      $request->query->set('file', $file);
+
+      return '/_flysystem/styles/' . $image_style . '/' . $scheme;
     }
 
     // Routes to FileDownloadController::download().
     $request->query->set('file', $rest);
 
-    return $path;
+    return '/_flysystem/' . $matches[1];
   }
 
 }
