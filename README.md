@@ -61,14 +61,20 @@ $schemes = [
     'driver' => 'local',         // The plugin key.
 
     'config' => [
-      'root' => '/path/to/dir',  // If 'root' is inside the public directory,
-    ],                           // then files will be served directly. Can be
-                                 // relative or absolute.
+      'root' => '/path/to/dir/outsite/drupal', // This will be treated similarly
+                                               // Drupal's private file system.
+      // Or.
+
+      'root' => 'sites/default/files/flysystem', // If the directory is inside
+      'public' => TRUE,                          // the public directory, and
+    ],                                           // public is set to TRUE,
+                                                 // files will be served
+                                                 // directly.
 
     // Optional settings that apply to all adapters.
 
-    'cache' => TRUE,             // Cache filesystem metadata. Not necessary,
-                                 // since this is a local filesystem.
+    'cache' => TRUE,             // Cache filesystem metadata. Not necessary for
+                                 // the local driver.
 
     'replicate' => 'ftpexample', // 'replicate' writes to both filesystems, but
                                  // reads from this one. Functions as a backup.
