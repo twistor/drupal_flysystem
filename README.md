@@ -22,17 +22,17 @@ to manage dependencies, and just install this module.
  1. Download composer_manager.
  2. Download flysystem.
  3. Initialize composer_manager:
- 4. Move into the core/ directory.
+ 4. Update composer dependencies.
  5. Install Flysystem.
  6. Enjoy.
 
 Steps performed from the root of the Drupal install. Module locations may vary.
 
 ```bash
-drush dl composer_manager && flysystem
-php modules/composer_manager/scripts/init.sh
-cd core/
-composer drupal-rebuild && composer update
+drush dl composer_manager flysystem
+php modules/composer_manager/scripts/init.php
+composer drupal-rebuild
+composer update --lock
 drush en flysystem -y
 ```
 
