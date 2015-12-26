@@ -7,7 +7,7 @@
 
 namespace Drupal\flysystem\Plugin;
 
-use Drupal\Core\Url;
+use Drupal\Component\Utility\Crypt;
 use Drupal\image\Entity\ImageStyle;
 
 /**
@@ -35,22 +35,39 @@ trait ImageStyleGenerationTrait {
       return FALSE;
     }
 
-    $token = $image_style->getPathToken($scheme . '://' . $file);
+    $image_uri = $scheme . '://' . $file;
 
-    $parameters = ['scheme' => $scheme, 'filepath' => $target];
-    $options = ['query' => ['itok' => $token], 'absolute' => TRUE];
-    $url = Url::fromRoute('flysystem.serve', $parameters, $options);
+    $derivative_uri = $image_style->buildUri($image_uri);
 
-    // @todo This should probably be a sub-request, but at the moment, that is
-    // causing weird errors.
-    try {
-      $response = \Drupal::httpClient()->get($url->toString());
+    if (!file_exists($image_uri)) {
+      $path_info = pathinfo($image_uri);
+      $converted_image_uri = $path_info['dirname'] . '/' . $path_info['filename'];
+
+      if (!file_exists($converted_image_uri)) {
+        return FALSE;
+      }
+      else {
+        // The converted file does exist, use it as the source.
+        $image_uri = $converted_image_uri;
+      }
     }
-    catch (\Exception $e) {
-      return FALSE;
+
+    $lock_name = 'image_style_deliver:' . $image_style->id() . ':' . Crypt::hashBase64($image_uri);
+
+    if (!file_exists($derivative_uri)) {
+      $lock_acquired = \Drupal::lock()->acquire($lock_name);
+      if (!$lock_acquired) {
+        return FALSE;
+      }
     }
 
-    return $response->getStatusCode() == 200;
+    $success = file_exists($derivative_uri) || $image_style->createDerivative($image_uri, $derivative_uri);
+
+    if (!empty($lock_acquired)) {
+      \Drupal::lock()->release($lock_name);
+    }
+
+    return $success;
   }
 
 }
