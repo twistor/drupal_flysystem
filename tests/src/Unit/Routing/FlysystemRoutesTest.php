@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \NoDrupal\Tests\flysystem\Unit\Routing\FlysystemRoutesTest
+ * Contains \NoDrupal\Tests\flysystem\Unit\Routing\FlysystemRoutesTest.
  */
 
 namespace NoDrupal\Tests\flysystem\Unit\Routing;
@@ -67,13 +67,13 @@ class FlysystemRoutesTest extends UnitTestCase {
     new Settings(['flysystem' => $schemes]);
 
     $expected = new Route(
-      '/sites/default/files/flysystem/{scheme}',
+      '/sites/default/files/flysystem',
       [
         '_controller' => 'Drupal\system\FileDownloadController::download',
+        'scheme' => 'test',
       ],
       [
         '_access' => 'TRUE',
-        'scheme' => '^[a-zA-Z0-9+.-]+$',
       ]
     );
 

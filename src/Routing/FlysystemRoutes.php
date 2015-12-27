@@ -78,26 +78,26 @@ class FlysystemRoutes implements ContainerInjectionInterface {
       }
 
       $routes['flysystem.' . $scheme . '.serve'] = new Route(
-        '/' . $settings['config']['root'] . '/{scheme}',
+        '/' . $settings['config']['root'],
         [
           '_controller' => 'Drupal\system\FileDownloadController::download',
+          'scheme' => $scheme,
         ],
         [
           '_access' => 'TRUE',
-          'scheme' => '^[a-zA-Z0-9+.-]+$',
         ]
       );
 
       if ($this->moduleHandler->moduleExists('image')) {
         // Public image route.
         $routes['flysystem.' . $scheme . '.style_public'] = new Route(
-          '/' . $settings['config']['root'] . '/styles/{image_style}/{scheme}',
+          '/' . $settings['config']['root'] . '/styles/{image_style}/' . $scheme,
           [
             '_controller' => 'Drupal\image\Controller\ImageStyleDownloadController::deliver',
+            'scheme' => $scheme,
           ],
           [
             '_access' => 'TRUE',
-            'scheme' => '^[a-zA-Z0-9+.-]+$',
           ]
         );
       }

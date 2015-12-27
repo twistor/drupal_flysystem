@@ -67,7 +67,7 @@ class LocalPathProcessor implements InboundPathProcessorInterface {
 
     $request->query->set('file', $rest);
 
-    return '/' . $this->root . '/' . $this->scheme;
+    return '/' . $this->root;
   }
 
 }
