@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Lock\NullLockBackend;
+use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\Plugin\ImageStyleGenerationTrait;
 use Drupal\image\Entity\ImageStyle;
 use Prophecy\Argument;
@@ -21,7 +22,7 @@ use org\bovigo\vfs\vfsStream;
  * @coversDefaultClass \Drupal\flysystem\Plugin\ImageStyleGenerationTrait
  * @group flysystem
  */
-class ImageStyleGenerationTraitTest extends \PHPUnit_Framework_TestCase {
+class ImageStyleGenerationTraitTest extends UnitTestCase {
 
   /**
    * @covers ::generateImageStyle

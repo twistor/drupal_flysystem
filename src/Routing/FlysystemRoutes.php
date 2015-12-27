@@ -38,6 +38,8 @@ class FlysystemRoutes implements ContainerInjectionInterface {
    *
    * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
    *   The stream wrapper manager service.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
    */
   public function __construct(StreamWrapperManagerInterface $stream_wrapper_manager, ModuleHandlerInterface $module_handler) {
     $this->streamWrapperManager = $stream_wrapper_manager;
@@ -55,7 +57,7 @@ class FlysystemRoutes implements ContainerInjectionInterface {
   }
 
   /**
-   * Returns an array of route objects.
+   * Returns a list of route objects.
    *
    * @return \Symfony\Component\Routing\Route[]
    *   An array of route objects.
@@ -77,26 +79,26 @@ class FlysystemRoutes implements ContainerInjectionInterface {
 
       $routes['flysystem.' . $scheme . '.serve'] = new Route(
         '/' . $settings['config']['root'] . '/{scheme}',
-        array(
+        [
           '_controller' => 'Drupal\system\FileDownloadController::download',
-        ),
-        array(
+        ],
+        [
           '_access' => 'TRUE',
           'scheme' => '^[a-zA-Z0-9+.-]+$',
-        )
+        ]
       );
 
       if ($this->moduleHandler->moduleExists('image')) {
         // Public image route.
         $routes['flysystem.' . $scheme . '.style_public'] = new Route(
           '/' . $settings['config']['root'] . '/styles/{image_style}/{scheme}',
-          array(
+          [
             '_controller' => 'Drupal\image\Controller\ImageStyleDownloadController::deliver',
-          ),
-          array(
+          ],
+          [
             '_access' => 'TRUE',
             'scheme' => '^[a-zA-Z0-9+.-]+$',
-          )
+          ]
         );
       }
     }
@@ -105,13 +107,13 @@ class FlysystemRoutes implements ContainerInjectionInterface {
       // Internal image rotue.
       $routes['flysystem.image_style'] = new Route(
         '/_flysystem/styles/{image_style}/{scheme}',
-        array(
+        [
           '_controller' => 'Drupal\image\Controller\ImageStyleDownloadController::deliver',
-        ),
-        array(
+        ],
+        [
           '_access' => 'TRUE',
           'scheme' => '^[a-zA-Z0-9+.-]+$',
-        )
+        ]
       );
     }
 
