@@ -55,6 +55,11 @@ class FlysystemServiceProviderTest extends \PHPUnit_Framework_TestCase {
     $provider->register($container);
     $this->assertSame('Drupal\flysystem\Asset\AssetDumper', $container->getDefinition('asset.js.dumper')->getClass());
     $this->assertSame('Drupal\flysystem\Asset\JsCollectionOptimizer', $container->getDefinition('asset.js.collection_optimizer')->getClass());
+
+    // Test that local route provider gets added.
+    new Settings(['flysystem' => ['testscheme' => ['driver' => 'local', 'config' => ['public' => TRUE]]]]);
+    $provider->register($container);
+    $this->assertSame('Drupal\flysystem\PathProcessor\LocalPathProcessor', $container->getDefinition('flysystem.testscheme.path_processor')->getClass());
   }
 
 }
