@@ -10,7 +10,6 @@ namespace Drupal\flysystem\Form;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Site\Settings;
 use Drupal\flysystem\FlysystemFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -54,7 +53,7 @@ class ConfigForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $schemes = array_keys(Settings::get('flysystem', []));
+    $schemes = $this->factory->getSchemes();
 
     $form['sync_from'] = [
       '#type' => 'select',

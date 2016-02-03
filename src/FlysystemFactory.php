@@ -9,6 +9,7 @@ namespace Drupal\flysystem;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Site\Settings;
 use League\Flysystem\Cached\CachedAdapter;
 use League\Flysystem\Filesystem;
@@ -81,22 +82,27 @@ class FlysystemFactory {
    *
    * @param \Drupal\Component\Plugin\PluginManagerInterface $plugin_manager
    *   The plugin manager.
+   * @param \Drupal\Core\File\FileSystemInterface $filesystem
+   *   The Drupal filesystem service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The system settings.
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger.
    */
-  public function __construct(PluginManagerInterface $plugin_manager, CacheBackendInterface $cache, Settings $settings, LoggerInterface $logger) {
+  public function __construct(PluginManagerInterface $plugin_manager, FileSystemInterface $filesystem, CacheBackendInterface $cache, LoggerInterface $logger) {
     $this->pluginManager = $plugin_manager;
     $this->cacheBackend = $cache;
     $this->logger = $logger;
-    $this->settings = $settings->get('flysystem', []);
 
-    // Apply defaults.
-    foreach ($this->settings as $scheme => $configuration) {
-      $this->settings[$scheme] += $this->defaults;
+    // Apply defaults and validate registered services.
+    foreach (Settings::get('flysystem', []) as $scheme => $configuration) {
+
+      // The settings.php file could be changed before rebuilding the container.
+      if (!$filesystem->validScheme($scheme)) {
+        continue;
+      }
+
+      $this->settings[$scheme] = $configuration + $this->defaults;
     }
   }
 
@@ -137,6 +143,16 @@ class FlysystemFactory {
   }
 
   /**
+   * Returns a list of valid schemes.
+   *
+   * @return string[]
+   *   The list of valid schemes.
+   */
+  public function getSchemes() {
+    return array_keys($this->settings);
+  }
+
+  /**
    * Calls FlysystemPluginInterface::ensure() on each plugin.
    *
    * @param bool $force
@@ -148,7 +164,7 @@ class FlysystemFactory {
   public function ensure($force = FALSE) {
     $errors = [];
 
-    foreach ($this->settings as $scheme => $configuration) {
+    foreach ($this->getSchemes() as $scheme) {
 
       foreach ($this->getPlugin($scheme)->ensure($force) as $error) {
 

@@ -11,6 +11,7 @@ use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Site\Settings;
 use Drupal\flysystem\FlysystemFactory;
 use League\Flysystem\Adapter\NullAdapter;
+use Prophecy\Argument;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\FlysystemFactory
@@ -31,40 +32,48 @@ class FlysystemFactoryTest extends \PHPUnit_Framework_TestCase {
 
     $plugin_manager->createInstance('testdriver', [])->willReturn($plugin->reveal());
 
-    $settings = new Settings([
+    $filesystem = $this->prophesize('Drupal\Core\File\FileSystemInterface');
+    $filesystem->validScheme(Argument::type('string'))->willReturn(TRUE);
+
+    new Settings([
       'flysystem' => [
         'testscheme' => ['driver' => 'testdriver'],
       ],
     ]);
 
-    $factory = new FlysystemFactory($plugin_manager->reveal(), $cache,  $settings, $logger);
+    $factory = new FlysystemFactory($plugin_manager->reveal(), $filesystem->reveal(), $cache, $logger);
 
     $this->assertInstanceOf('League\Flysystem\FilesystemInterface', $factory->getFilesystem('testscheme'));
     $this->assertInstanceOf('League\Flysystem\Adapter\NullAdapter', $factory->getFilesystem('testscheme')->getAdapter());
 
     // Test cache wrapping.
-    $settings = new Settings([
+    new Settings([
       'flysystem' => [
         'testscheme' => ['driver' => 'testdriver' , 'cache' => TRUE],
       ],
     ]);
 
-    $factory = new FlysystemFactory($plugin_manager->reveal(), $cache,  $settings, $logger);
+    $factory = new FlysystemFactory($plugin_manager->reveal(), $filesystem->reveal(), $cache, $logger);
     $this->assertInstanceOf('League\Flysystem\FilesystemInterface', $factory->getFilesystem('testscheme'));
     $this->assertInstanceOf('League\Flysystem\Cached\CachedAdapter', $factory->getFilesystem('testscheme')->getAdapter());
 
     // Test replicate.
     $plugin_manager->createInstance('wrapped', [])->willReturn($plugin->reveal());
 
-    $settings = new Settings([
+    new Settings([
       'flysystem' => [
         'testscheme' => ['driver' => 'testdriver' , 'replicate' => 'wrapped'],
         'wrapped' => ['driver' => 'testdriver'],
       ],
     ]);
-    $factory = new FlysystemFactory($plugin_manager->reveal(), $cache,  $settings, $logger);
+    $factory = new FlysystemFactory($plugin_manager->reveal(), $filesystem->reveal(), $cache, $logger);
     $this->assertInstanceOf('League\Flysystem\FilesystemInterface', $factory->getFilesystem('testscheme'));
     $this->assertInstanceOf('League\Flysystem\Replicate\ReplicateAdapter', $factory->getFilesystem('testscheme')->getAdapter());
+
+    // Test invalid scheme.
+    $filesystem->validScheme('wrapped')->willReturn(FALSE);
+    $factory = new FlysystemFactory($plugin_manager->reveal(), $filesystem->reveal(), $cache, $logger);
+    $this->assertSame(['testscheme'], $factory->getSchemes());
 
     // Test ensure.
     $plugin->ensure(FALSE)->willReturn([[

@@ -11,6 +11,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
+use Drupal\flysystem\FlysystemFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 
@@ -18,6 +19,13 @@ use Symfony\Component\Routing\Route;
  * Defines a route subscriber to register a url for serving image styles.
  */
 class FlysystemRoutes implements ContainerInjectionInterface {
+
+  /**
+   * The Flysystem factory.
+   *
+   * @var \Drupal\flysystem\FlysystemFactory
+   */
+  protected $factory;
 
   /**
    * The module handler.
@@ -36,12 +44,15 @@ class FlysystemRoutes implements ContainerInjectionInterface {
   /**
    * Constructs a new FlysystemRoutes object.
    *
+   * @param \Drupal\flysystem\FlysystemFactory $factory
+   *   The Flysystem factory.
    * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
    *   The stream wrapper manager service.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    */
-  public function __construct(StreamWrapperManagerInterface $stream_wrapper_manager, ModuleHandlerInterface $module_handler) {
+  public function __construct(FlysystemFactory $factory, StreamWrapperManagerInterface $stream_wrapper_manager, ModuleHandlerInterface $module_handler) {
+    $this->factory = $factory;
     $this->streamWrapperManager = $stream_wrapper_manager;
     $this->moduleHandler = $module_handler;
   }
@@ -51,6 +62,7 @@ class FlysystemRoutes implements ContainerInjectionInterface {
    */
   public static function create(ContainerInterface $container) {
     return new static(
+      $container->get('flysystem_factory'),
       $container->get('stream_wrapper_manager'),
       $container->get('module_handler')
     );
@@ -66,7 +78,11 @@ class FlysystemRoutes implements ContainerInjectionInterface {
     $public_directory_path = $this->streamWrapperManager->getViaScheme('public')->getDirectoryPath();
     $routes = [];
 
-    foreach (Settings::get('flysystem', []) as $scheme => $settings) {
+    $all_settings = Settings::get('flysystem', []);
+
+    foreach ($this->factory->getSchemes() as $scheme) {
+      $settings = $all_settings[$scheme];
+
       if ($settings['driver'] !== 'local' || empty($settings['config']['public'])) {
         continue;
       }

@@ -45,6 +45,7 @@ class ConfigFormTest extends UnitTestCase {
     $this->factory = $this->prophesize('Drupal\flysystem\FlysystemFactory');
     $this->factory->getFilesystem('from_empty')->willReturn(new Filesystem(new MemoryAdapter()));
     $this->factory->getFilesystem('to_empty')->willReturn(new Filesystem(new MemoryAdapter()));
+    $this->factory->getSchemes()->willReturn(['from_empty', 'to_empty']);
 
     $this->form = new ConfigForm($this->factory->reveal());
     $this->form->setStringTranslation($this->getStringTranslationStub());

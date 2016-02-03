@@ -75,11 +75,9 @@ class ModuleFunctionsTest extends UnitTestCase {
    * Tests flysystem_file_download().
    */
   public function testFlysystemFileDownload() {
-    new Settings(['flysystem' => []]);
+    $this->factory->getSchemes()->willReturn(['vfs']);
 
-    $this->assertNull(flysystem_file_download('vfs://module_file/file.txt'));
-
-    new Settings(['flysystem' => ['vfs' => ['driver' => 'testdriver']]]);
+    $this->assertNull(flysystem_file_download('invalid://module_file/file.txt'));
 
     file_put_contents('vfs://module_file/file.txt', '1234');
 

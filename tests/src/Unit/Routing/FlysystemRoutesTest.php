@@ -13,6 +13,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\LocalStream;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use Drupal\flysystem\FlysystemFactory;
 use Drupal\flysystem\Routing\FlysystemRoutes;
 use Symfony\Component\Routing\Route;
 
@@ -38,13 +39,19 @@ class FlysystemRoutesTest extends UnitTestCase {
 
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
 
+    $factory = $this->prophesize(FlysystemFactory::class);
+
+    $container->set('flysystem_factory', $factory->reveal());
     $container->set('stream_wrapper_manager', $stream_wrapper_manager->reveal());
     $container->set('module_handler', $module_handler->reveal());
 
     $router = FlysystemRoutes::create($container);
 
+    new Settings(['flysystem' => ['test' => ['driver' => 'local']]]);
+    $factory->getSchemes()->willReturn([]);
     $this->assertSame([], $router->routes());
 
+    $factory->getSchemes()->willReturn(['test']);
     new Settings(['flysystem' => ['test' => ['driver' => 'local']]]);
     $this->assertSame([], $router->routes());
     new Settings(['flysystem' => ['test' => ['driver' => 'ftp']]]);

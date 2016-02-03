@@ -5,8 +5,6 @@
  * Provides access to various filesystem backends using Flysystem.
  */
 
-use Drupal\Core\Site\Settings;
-
 /**
  * Implements hook_cron().
  */
@@ -25,10 +23,10 @@ function flysystem_rebuild() {
  * Implements hook_file_download().
  */
 function flysystem_file_download($uri) {
-  $schemes = Settings::get('flysystem', []);
+  $schemes = Drupal::service('flysystem_factory')->getSchemes();
   $scheme = Drupal::service('file_system')->uriScheme($uri);
 
-  if (!$scheme || !isset($schemes[$scheme])) {
+  if (!$scheme || !in_array($scheme, $schemes, TRUE)) {
     return;
   }
 
