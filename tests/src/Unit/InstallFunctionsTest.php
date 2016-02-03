@@ -9,6 +9,8 @@ namespace Drupal\Tests\flysystem\Unit;
 
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Tests\UnitTestCase;
+use Drupal\flysystem\FlysystemFactory;
+use League\Flysystem\Filesystem;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -30,9 +32,14 @@ class InstallFunctionsTest extends UnitTestCase {
    */
   public function setUp() {
     parent::setUp();
+
+    if (!defined('REQUIREMENT_ERROR')) {
+      define('REQUIREMENT_ERROR', 2);
+    }
+
     require_once dirname(dirname(dirname(__DIR__))) . '/flysystem.install';
 
-    $this->factory = $this->prophesize('Drupal\flysystem\FlysystemFactory');
+    $this->factory = $this->prophesize(FlysystemFactory::class);
 
     $container = new ContainerBuilder();
     $container->set('flysystem_factory', $this->factory->reveal());
@@ -42,21 +49,25 @@ class InstallFunctionsTest extends UnitTestCase {
   }
 
   /**
-   * Tests flysystem_requirements().
+   * Tests flysystem_requirements() handles update.
    */
-  public function testFlysystemRequirements() {
-    if (!defined('REQUIREMENT_ERROR')) {
-      define('REQUIREMENT_ERROR', 2);
-    }
-
-    $dependencies_exist = (int) class_exists('League\Flysystem\Filesystem');
-
+  public function testFlysystemRequirementsHandlesUpdate() {
     $return = flysystem_requirements('update');
     $this->assertSame(0, count($return));
+  }
 
+  /**
+   * Tests flysystem_requirements() handles install.
+   */
+  public function testFlysystemRequirementsHandlesInstall() {
     $return = flysystem_requirements('install');
-    $this->assertSame(1 - $dependencies_exist, count($return));
+    $this->assertSame(0, count($return));
+  }
 
+  /**
+   * Tests flysystem_requirements() handles runtime.
+   */
+  public function testFlysystemRequirementsHandlesRuntime() {
     $this->factory->ensure()->willReturn([
       'testscheme' => [[
         'message' => 'Test message',
@@ -67,14 +78,14 @@ class InstallFunctionsTest extends UnitTestCase {
 
     $return = flysystem_requirements('runtime');
 
-    $this->assertSame(2 - $dependencies_exist, count($return));
+    $this->assertSame(1, count($return));
     $this->assertSame('Test message', (string) $return['flysystem:testscheme']['description']);
   }
 
   /**
-   * Tests flysystem_install().
+   * Tests flysystem_install() calls ensure().
    */
-  public function testFlysystemInstall() {
+  public function testFlysystemInstallCallsEnsure() {
     $this->factory->ensure()->shouldBeCalled();
     flysystem_install();
   }

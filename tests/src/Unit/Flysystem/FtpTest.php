@@ -7,32 +7,59 @@
 
 namespace NoDrupal\Tests\flysystem\Unit\Flysystem {
 
+use Drupal\Tests\UnitTestCase;
+use Drupal\flysystem\Flysystem\Adapter\MissingAdapter;
 use Drupal\flysystem\Flysystem\Ftp;
+use League\Flysystem\Adapter\Ftp as LeagueFtp;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\Flysystem\Ftp
  * @group flysystem
  */
-class FtpTest extends \PHPUnit_Framework_TestCase {
+class FtpTest extends UnitTestCase {
 
   /**
-   * @covers \Drupal\flysystem\Flysystem\Ftp
+   * {@inheritdoc}
    */
-  public function test() {
+  public function setUp() {
+    parent::setUp();
     if (!defined('FTP_BINARY')) {
       $this->markTestSkipped('The FTP_BINARY constant is not defined.');
     }
+  }
 
+  /**
+   * @covers ::getAdapter
+   * @covers ::__construct
+   */
+  public function testGetAdapterSuccess() {
     $plugin = new Ftp(['host' => 'success']);
-    $this->assertInstanceOf('League\Flysystem\Adapter\Ftp', $plugin->getAdapter());
-    $this->assertTrue(is_array($plugin->ensure()));
-    $this->assertSame(0, count($plugin->ensure()));
+    $this->assertInstanceOf(LeagueFtp::class, $plugin->getAdapter());
+  }
 
-    // Test broken connection behavior.
+  /**
+   * @covers ::getAdapter
+   * @covers ::__construct
+   */
+  public function testGetAdapterFails() {
     $plugin = new Ftp([]);
-    $this->assertInstanceOf('Drupal\flysystem\Flysystem\Adapter\MissingAdapter', $plugin->getAdapter());
+    $this->assertInstanceOf(MissingAdapter::class, $plugin->getAdapter());
+  }
+
+  /**
+   * @covers ::ensure
+   */
+  public function testEnsureReturnsNoErrorsOnSuccess() {
+    $plugin = new Ftp(['host' => 'success']);
+    $this->assertSame(0, count($plugin->ensure()));
+  }
+
+  /**
+   * @covers ::ensure
+   */
+  public function testEnsureReturnsErrors() {
+    $plugin = new Ftp([]);
     $result = $plugin->ensure();
-    $this->assertTrue(is_array($result));
     $this->assertSame(1, count($result));
     $this->assertSame(21, $result[0]['context']['%port']);
   }

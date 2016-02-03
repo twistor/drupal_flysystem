@@ -9,8 +9,13 @@ namespace NoDrupal\Tests\flysystem\Unit\Flysystem;
 
 use Drupal\Component\PhpStorage\FileStorage;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\DrupalKernelInterface;
+use Drupal\Core\Routing\UrlGenerator;
 use Drupal\Core\Site\Settings;
+use Drupal\Tests\UnitTestCase;
+use Drupal\flysystem\Flysystem\Adapter\MissingAdapter;
 use Drupal\flysystem\Flysystem\Local;
+use Drupal\flysystem\Plugin\FlysystemPluginInterface;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\Filesystem;
 use Prophecy\Argument;
@@ -19,7 +24,7 @@ use Prophecy\Argument;
  * @coversDefaultClass \Drupal\flysystem\Flysystem\Local
  * @group flysystem
  */
-class LocalTest extends \PHPUnit_Framework_TestCase {
+class LocalTest extends UnitTestCase {
 
   /**
    * The first directory path.
@@ -53,7 +58,7 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     mkdir($this->one);
     mkdir($this->two);
 
-    $url_generator = $this->prophesize('Drupal\Core\Routing\UrlGenerator');
+    $url_generator = $this->prophesize(UrlGenerator::class);
     $url_generator->generateFromRoute(Argument::cetera())->willReturn('download');
     $this->UrlGenerator = $url_generator->reveal();
   }
@@ -70,7 +75,7 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
    * @covers ::__construct
    */
   public function testCreate() {
-    $kernel = $this->prophesize('Drupal\Core\DrupalKernelInterface');
+    $kernel = $this->prophesize(DrupalKernelInterface::class);
     $kernel->getSitePath()->willReturn('');
 
     $container = new ContainerBuilder();
@@ -82,7 +87,7 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
     $configuration = ['root' => $this->two];
 
     $plugin = Local::create($container, $configuration, NULL, NULL);
-    $this->assertInstanceOf('Drupal\flysystem\Plugin\FlysystemPluginInterface', $plugin);
+    $this->assertInstanceOf(FlysystemPluginInterface::class, $plugin);
   }
 
   /**
@@ -90,12 +95,12 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
    */
   public function testGetAdapter() {
     $local = new Local(__DIR__, $this->one);
-    $this->assertInstanceOf('League\Flysystem\Adapter\Local', $local->getAdapter());
+    $this->assertInstanceOf(LocalAdapter::class, $local->getAdapter());
 
     // Test autocreate dir.
     $this->assertFalse(is_dir(__DIR__ . '/flysystem/sub'));
     $local = new Local($this->one, __DIR__ . '/flysystem/sub', FALSE, 0777);
-    $this->assertInstanceOf('League\Flysystem\Adapter\Local', $local->getAdapter());
+    $this->assertInstanceOf(LocalAdapter::class, $local->getAdapter());
     $this->assertTrue(is_dir(__DIR__ . '/flysystem/sub'));
     $this->assertSame(040777, stat(__DIR__ . '/flysystem/sub')['mode']);
     $this->assertHtaccessFile(__DIR__ . '/flysystem/sub/.htaccess');
@@ -107,7 +112,7 @@ class LocalTest extends \PHPUnit_Framework_TestCase {
 
     // Can't autocreate dir because it's a file.
     $local = new Local(__DIR__, __FILE__);
-    $this->assertInstanceOf('Drupal\flysystem\Flysystem\Adapter\MissingAdapter', $local->getAdapter());
+    $this->assertInstanceOf(MissingAdapter::class, $local->getAdapter());
   }
 
   /**

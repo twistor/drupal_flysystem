@@ -10,6 +10,7 @@ namespace NoDrupal\Tests\flysystem\Unit;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\FlysystemBridge;
+use Drupal\flysystem\FlysystemFactory;
 use Drupal\flysystem\Flysystem\Adapter\MissingAdapter;
 use Drupal\flysystem\Flysystem\Missing;
 use League\Flysystem\Filesystem;
@@ -22,38 +23,97 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class FlysystemBridgeTest extends UnitTestCase {
 
   /**
-   * @covers \Drupal\flysystem\FlysystemBridge
+   * @var \Drupal\flysystem\FlysystemBridge
    */
-  public function testDrupalMethods() {
-    $this->assertSame(StreamWrapperInterface::WRITE_VISIBLE, FlysystemBridge::getType());
+  protected $bridge;
 
-    $bridge = new FlysystemBridge();
-    $bridge->setStringTranslation($this->getStringTranslationStub());
+  /**
+   * @var \League\Flysystem\FilesystemInterface
+   */
+  protected $filesystem;
 
-    $uri = 'testscheme://file.txt';
-    $bridge->setUri($uri);
-    $this->assertSame('testscheme://file.txt', $bridge->getUri($uri));
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
+    $this->bridge = new FlysystemBridge();
+    $this->bridge->setStringTranslation($this->getStringTranslationStub());
+    $this->bridge->setUri('testscheme://file.txt');
 
-    $this->assertSame('Flysystem: testscheme', (string) $bridge->getName());
-    $this->assertSame('Flysystem: testscheme', (string) $bridge->getDescription());
-    $this->assertFalse($bridge->realpath());
-    $this->assertSame('testscheme://', $bridge->dirname());
-    $this->assertSame('testscheme://dir://dir', $bridge->dirname('testscheme:///dir://dir/file.txt'));
-
-    $factory = $this->prophesize('Drupal\flysystem\FlysystemFactory');
+    $factory = $this->prophesize(FlysystemFactory::class);
     $factory->getPlugin('testscheme')->willReturn(new Missing());
-    $filesystem = new Filesystem(new MissingAdapter());
-    $factory->getFilesystem('testscheme')->willReturn($filesystem);
+
+    $this->filesystem = new Filesystem(new MissingAdapter());
+
+    $factory->getFilesystem('testscheme')->willReturn($this->filesystem);
 
     $container = new ContainerBuilder();
-    \Drupal::setContainer($container);
     $container->set('flysystem_factory', $factory->reveal());
+    \Drupal::setContainer($container);
+  }
 
-    $this->assertSame('', $bridge->getExternalUrl('testscheme://testfile.txt'));
+  /**
+   * @covers ::getType
+   */
+  public function testGetTypeReturnsWriteVisible() {
+    $this->assertSame(StreamWrapperInterface::WRITE_VISIBLE, FlysystemBridge::getType());
+  }
 
-    $method = new \ReflectionMethod($bridge, 'getFilesystem');
+  /**
+   * @covers ::getName
+   */
+  public function testGetNameFormattingCorrect() {
+    $this->assertSame('Flysystem: testscheme', (string) $this->bridge->getName());
+  }
+
+  /**
+   * @covers ::getDescription
+   */
+  public function testGetDescriptionFormattingCorrect() {
+    $this->assertSame('Flysystem: testscheme', (string) $this->bridge->getDescription());
+  }
+
+  /**
+   * @covers ::getUri
+   * @covers ::setUri
+   */
+  public function testGetUriMatchesSetUri() {
+    $this->bridge->setUri('beep://boop');
+    $this->assertSame('beep://boop', $this->bridge->getUri());
+  }
+
+  /**
+   * @covers ::getExternalUrl
+   * @covers ::getFactory
+   */
+  public function testGetExternalUrlDelegatesToPlugin() {
+    $this->assertSame('', $this->bridge->getExternalUrl('testscheme://testfile.txt'));
+  }
+
+  /**
+   * @covers ::realpath
+   */
+  public function testRealpathIsFalse() {
+    $this->assertFalse($this->bridge->realpath());
+  }
+
+  /**
+   * @covers ::dirname
+   */
+  public function testDirname() {
+    $this->assertSame('testscheme://', $this->bridge->dirname());
+    $this->assertSame('testscheme://dir://dir', $this->bridge->dirname('testscheme:///dir://dir/file.txt'));
+  }
+
+  /**
+   * @covers ::getFilesystem
+   * @covers ::getFilesystemForScheme
+   */
+  public function testGetFilesystemOverridden() {
+    $method = new \ReflectionMethod($this->bridge, 'getFilesystem');
     $method->setAccessible(TRUE);
-    $this->assertSame($filesystem, $method->invoke($bridge));
+    $this->assertSame($this->filesystem, $method->invoke($this->bridge));
   }
 
 }

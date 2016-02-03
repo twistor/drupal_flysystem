@@ -7,59 +7,99 @@
 
 namespace Drupal\Tests\flysystem\Unit;
 
+use Drupal\Core\Asset\AssetDumper;
+use Drupal\Core\Asset\JsCollectionOptimizer;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Site\Settings;
+use Drupal\Tests\UnitTestCase;
+use Drupal\flysystem\Asset\AssetDumper as FlysystemAssetDumper;
+use Drupal\flysystem\Asset\JsCollectionOptimizer as FlysystemJsCollectionOptimizer;
+use Drupal\flysystem\FlysystemBridge;
 use Drupal\flysystem\FlysystemServiceProvider;
+use Drupal\flysystem\PathProcessor\LocalPathProcessor;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\FlysystemServiceProvider
  * @group flysystem
  */
-class FlysystemServiceProviderTest extends \PHPUnit_Framework_TestCase {
+class FlysystemServiceProviderTest extends UnitTestCase {
+
+  /**
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   */
+  protected $container;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    $this->container = new ContainerBuilder();
+  }
+
+  /**
+   * @covers ::register
+   */
+  public function testNothingFailsIfContainerIsEmpty() {
+    new Settings([]);
+    (new FlysystemServiceProvider())->register($this->container);
+  }
+
+  /**
+   * @covers ::register
+   */
+  public function testMissingDriverIsSkipped() {
+    new Settings(['flysystem' => ['testscheme' => []]]);
+
+    (new FlysystemServiceProvider())->register($this->container);
+
+    $this->assertFalse($this->container->has('flysystem_stream_wrapper.testscheme'));
+  }
+
+  /**
+   * @covers ::register
+   */
+  public function testValidSchemeConfiguration() {
+    new Settings(['flysystem' => ['testscheme' => ['driver' => 'whatever']]]);
+
+    (new FlysystemServiceProvider())->register($this->container);
+
+    $this->assertTrue($this->container->has('flysystem_stream_wrapper.testscheme'));
+    $this->assertSame(FlysystemBridge::class, $this->container->getDefinition('flysystem_stream_wrapper.testscheme')->getClass());
+    $this->assertSame([['scheme' => 'testscheme']], $this->container->getDefinition('flysystem_stream_wrapper.testscheme')->getTag('stream_wrapper'));
+  }
+
+  /**
+   * @covers ::register
+   */
+  public function testLocalRouteProviderGetsAdded() {
+    new Settings([
+      'flysystem' => [
+        'testscheme' => ['driver' => 'local', 'config' => ['public' => TRUE]]],
+    ]);
+
+    (new FlysystemServiceProvider())->register($this->container);
+    $this->assertSame(LocalPathProcessor::class, $this->container->getDefinition('flysystem.testscheme.path_processor')->getClass());
+  }
 
   /**
    * @covers \Drupal\flysystem\FlysystemServiceProvider
    */
   public function test() {
-    $container = new ContainerBuilder();
-    $provider = new FlysystemServiceProvider();
-
-    // Test that nothing fails when the container is empty.
-    new Settings([]);
-    $provider->register($container);
-
-    // Test that missing driver is skipped.
-    new Settings(['flysystem' => ['testscheme' => []]]);
-    $provider->register($container);
-    $this->assertFalse($container->has('flysystem_stream_wrapper.testscheme'));
-
-    // Test valid scheme configuration.
-    new Settings(['flysystem' => ['testscheme' => ['driver' => 'whatever']]]);
-    $provider->register($container);
-    $this->assertTrue($container->has('flysystem_stream_wrapper.testscheme'));
-    $this->assertSame('Drupal\flysystem\FlysystemBridge', $container->getDefinition('flysystem_stream_wrapper.testscheme')->getClass());
-    $this->assertSame([['scheme' => 'testscheme']], $container->getDefinition('flysystem_stream_wrapper.testscheme')->getTag('stream_wrapper'));
-
     // Test swapping the asset dumper.
-    $container->register('asset.js.dumper', 'Drupal\Core\Asset\AssetDumper');
-    $provider->register($container);
-    $this->assertSame('Drupal\Core\Asset\AssetDumper', $container->getDefinition('asset.js.dumper')->getClass());
+    $this->container->register('asset.js.dumper', AssetDumper::class);
+    (new FlysystemServiceProvider())->register($this->container);
+    $this->assertSame(AssetDumper::class, $this->container->getDefinition('asset.js.dumper')->getClass());
 
-    $container->register('asset.js.collection_optimizer', 'Drupal\Core\Asset\JsCollectionOptimizer');
-    $provider->register($container);
-    $this->assertSame('Drupal\Core\Asset\AssetDumper', $container->getDefinition('asset.js.dumper')->getClass());
-    $this->assertSame('Drupal\Core\Asset\JsCollectionOptimizer', $container->getDefinition('asset.js.collection_optimizer')->getClass());
+    $this->container->register('asset.js.collection_optimizer', JsCollectionOptimizer::class);
+    (new FlysystemServiceProvider())->register($this->container);
+    $this->assertSame(AssetDumper::class, $this->container->getDefinition('asset.js.dumper')->getClass());
+    $this->assertSame(JsCollectionOptimizer::class, $this->container->getDefinition('asset.js.collection_optimizer')->getClass());
 
     // A successful swap.
     new Settings(['flysystem' => ['testscheme' => ['driver' => 'whatever', 'serve_js' => TRUE]]]);
-    $provider->register($container);
-    $this->assertSame('Drupal\flysystem\Asset\AssetDumper', $container->getDefinition('asset.js.dumper')->getClass());
-    $this->assertSame('Drupal\flysystem\Asset\JsCollectionOptimizer', $container->getDefinition('asset.js.collection_optimizer')->getClass());
-
-    // Test that local route provider gets added.
-    new Settings(['flysystem' => ['testscheme' => ['driver' => 'local', 'config' => ['public' => TRUE]]]]);
-    $provider->register($container);
-    $this->assertSame('Drupal\flysystem\PathProcessor\LocalPathProcessor', $container->getDefinition('flysystem.testscheme.path_processor')->getClass());
+    (new FlysystemServiceProvider())->register($this->container);
+    $this->assertSame(FlysystemAssetDumper::class, $this->container->getDefinition('asset.js.dumper')->getClass());
+    $this->assertSame(FlysystemJsCollectionOptimizer::class, $this->container->getDefinition('asset.js.collection_optimizer')->getClass());
   }
 
 }

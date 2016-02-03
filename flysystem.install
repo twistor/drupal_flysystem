@@ -42,7 +42,6 @@ function flysystem_requirements($phase) {
     return $requirements;
   }
 
-  // @todo Map severity to requirement severity.
   foreach (\Drupal::service('flysystem_factory')->ensure() as $scheme => $errors) {
     foreach ($errors as $error) {
       $requirements['flysystem:' . $scheme] = [

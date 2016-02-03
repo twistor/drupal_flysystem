@@ -7,6 +7,7 @@
 
 namespace NoDrupal\Tests\flysystem\Unit\Flysystem\Adapter;
 
+use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\Flysystem\Adapter\MissingAdapter;
 use League\Flysystem\Config;
 
@@ -14,7 +15,7 @@ use League\Flysystem\Config;
  * @coversDefaultClass \Drupal\flysystem\Flysystem\Adapter\MissingAdapter
  * @group flysystem
  */
-class MissingAdapterTest extends \PHPUnit_Framework_TestCase {
+class MissingAdapterTest extends UnitTestCase {
 
   /**
    * @covers \Drupal\flysystem\Flysystem\Adapter\MissingAdapter

@@ -8,13 +8,14 @@
 namespace Drupal\Tests\flysystem\Unit\Logger;
 
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\Logger\Convert;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\Logger\Convert
  * @group flysystem
  */
-class ConvertTest extends \PHPUnit_Framework_TestCase {
+class ConvertTest extends UnitTestCase {
 
   /**
    * {@inheritdoc}

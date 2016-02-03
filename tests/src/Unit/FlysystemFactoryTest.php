@@ -7,58 +7,124 @@
 
 namespace NoDrupal\Tests\flysystem\Unit;
 
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Cache\NullBackend;
+use Drupal\Core\File\FileSystemInterface as CoreFileSystemInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\FlysystemFactory;
+use Drupal\flysystem\Flysystem\Adapter\MissingAdapter;
+use Drupal\flysystem\Flysystem\Missing;
+use Drupal\flysystem\Plugin\FlysystemPluginInterface;
 use League\Flysystem\Adapter\NullAdapter;
+use League\Flysystem\Cached\CachedAdapter;
+use League\Flysystem\FilesystemInterface;
+use League\Flysystem\Replicate\ReplicateAdapter;
 use Prophecy\Argument;
+use Psr\Log\LoggerInterface;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\FlysystemFactory
  * @group flysystem
  */
-class FlysystemFactoryTest extends \PHPUnit_Framework_TestCase {
+class FlysystemFactoryTest extends UnitTestCase {
 
   /**
-   * @covers \Drupal\flysystem\FlysystemFactory
+   * @var \Drupal\Core\Cache\CacheBackendInterface
    */
-  public function test() {
-    $cache = new NullBackend('bin');
-    $logger = $this->getMock('Psr\Log\LoggerInterface');
+  protected $cache;
 
-    $plugin_manager = $this->prophesize('Drupal\Component\Plugin\PluginManagerInterface');
-    $plugin = $this->prophesize('Drupal\flysystem\Plugin\FlysystemPluginInterface');
-    $plugin->getAdapter()->willReturn(new NullAdapter());
+  /**
+   * @var \Prophecy\Prophecy\ObjectProphecy
+   */
+  protected $filesystem;
 
-    $plugin_manager->createInstance('testdriver', [])->willReturn($plugin->reveal());
+  /**
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
 
-    $filesystem = $this->prophesize('Drupal\Core\File\FileSystemInterface');
-    $filesystem->validScheme(Argument::type('string'))->willReturn(TRUE);
+  /**
+   * @var \Prophecy\Prophecy\ObjectProphecy
+   */
+  protected $plugin;
 
+  /**
+   * @var \Prophecy\Prophecy\ObjectProphecy
+   */
+  protected $plguinManager;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
+
+    $this->cache = new NullBackend('bin');
+    $this->logger = $this->getMock(LoggerInterface::class);
+
+    $this->plugin_manager = $this->prophesize(PluginManagerInterface::class);
+    $this->plugin = $this->prophesize(FlysystemPluginInterface::class);
+    $this->plugin->getAdapter()->willReturn(new NullAdapter());
+
+    $this->plugin_manager->createInstance('testdriver', [])->willReturn($this->plugin->reveal());
+    $this->plugin_manager->createInstance('', [])->willReturn(new Missing());
+
+    $this->filesystem = $this->prophesize(CoreFileSystemInterface::class);
+    $this->filesystem->validScheme(Argument::type('string'))->willReturn(TRUE);
+  }
+
+  /**
+   * @covers ::getFilesystem
+   * @covers ::__construct
+   * @covers ::getAdapter
+   * @covers ::getSettings
+   * @covers ::getPlugin
+   */
+  public function testGetFilesystemReturnsValidFilesystem() {
     new Settings([
       'flysystem' => [
         'testscheme' => ['driver' => 'testdriver'],
       ],
     ]);
 
-    $factory = new FlysystemFactory($plugin_manager->reveal(), $filesystem->reveal(), $cache, $logger);
+    $factory = $this->getFactory();
 
-    $this->assertInstanceOf('League\Flysystem\FilesystemInterface', $factory->getFilesystem('testscheme'));
-    $this->assertInstanceOf('League\Flysystem\Adapter\NullAdapter', $factory->getFilesystem('testscheme')->getAdapter());
+    $this->assertInstanceOf(FilesystemInterface::class, $factory->getFilesystem('testscheme'));
+    $this->assertInstanceOf(NullAdapter::class, $factory->getFilesystem('testscheme')->getAdapter());
+  }
 
-    // Test cache wrapping.
+  /**
+   * @covers ::getFilesystem
+   */
+  public function testGetFilesystemReturnsMissingFilesystem() {
+    new Settings([]);
+    $factory = $this->getFactory();
+    $this->assertInstanceOf(MissingAdapter::class, $factory->getFilesystem('testscheme')->getAdapter());
+  }
+
+  /**
+   * @covers ::getFilesystem
+   * @covers ::getAdapter
+   */
+  public function testGetFilesystemReturnsCachedAdapter() {
     new Settings([
       'flysystem' => [
         'testscheme' => ['driver' => 'testdriver' , 'cache' => TRUE],
       ],
     ]);
 
-    $factory = new FlysystemFactory($plugin_manager->reveal(), $filesystem->reveal(), $cache, $logger);
-    $this->assertInstanceOf('League\Flysystem\FilesystemInterface', $factory->getFilesystem('testscheme'));
-    $this->assertInstanceOf('League\Flysystem\Cached\CachedAdapter', $factory->getFilesystem('testscheme')->getAdapter());
+    $factory = $this->getFactory();
+    $this->assertInstanceOf(CachedAdapter::class, $factory->getFilesystem('testscheme')->getAdapter());
+  }
 
+  /**
+   * @covers ::getFilesystem
+   * @covers ::getAdapter
+   */
+  public function testGetFilesystemReturnsReplicateAdapter() {
     // Test replicate.
-    $plugin_manager->createInstance('wrapped', [])->willReturn($plugin->reveal());
+    $this->plugin_manager->createInstance('wrapped', [])->willReturn($this->plugin->reveal());
 
     new Settings([
       'flysystem' => [
@@ -66,23 +132,54 @@ class FlysystemFactoryTest extends \PHPUnit_Framework_TestCase {
         'wrapped' => ['driver' => 'testdriver'],
       ],
     ]);
-    $factory = new FlysystemFactory($plugin_manager->reveal(), $filesystem->reveal(), $cache, $logger);
-    $this->assertInstanceOf('League\Flysystem\FilesystemInterface', $factory->getFilesystem('testscheme'));
-    $this->assertInstanceOf('League\Flysystem\Replicate\ReplicateAdapter', $factory->getFilesystem('testscheme')->getAdapter());
 
-    // Test invalid scheme.
-    $filesystem->validScheme('wrapped')->willReturn(FALSE);
-    $factory = new FlysystemFactory($plugin_manager->reveal(), $filesystem->reveal(), $cache, $logger);
-    $this->assertSame(['testscheme'], $factory->getSchemes());
+    $factory = $this->getFactory();
+    $this->assertInstanceOf(ReplicateAdapter::class, $factory->getFilesystem('testscheme')->getAdapter());
+  }
 
-    // Test ensure.
-    $plugin->ensure(FALSE)->willReturn([[
+  /**
+   * @covers ::getSchemes
+   * @covers ::__construct
+   */
+  public function testGetSchemesFiltersInvalidSchemes() {
+    new Settings([
+      'flysystem' => [
+        'testscheme' => ['driver' => 'testdriver'],
+        'invalidscheme' => ['driver' => 'testdriver'],
+      ],
+    ]);
+
+    $this->filesystem->validScheme('invalidscheme')->willReturn(FALSE);
+
+    $this->assertSame(['testscheme'], $this->getFactory()->getSchemes());
+  }
+
+  /**
+   * @covers ::ensure
+   */
+  public function testEnsureReturnsErrors() {
+    new Settings([
+      'flysystem' => [
+        'testscheme' => ['driver' => 'testdriver'],
+      ],
+    ]);
+
+    $this->plugin->ensure(FALSE)->willReturn([[
       'severity' => 'bad',
       'message' => 'Something bad',
       'context' => [],
     ]]);
-    $errors = $factory->ensure();
+
+    $errors = $this->getFactory()->ensure();
+
     $this->assertSame('Something bad', $errors['testscheme'][0]['message']);
+  }
+
+  /**
+   * @return \Drupal\flysystem\FlysystemFactory
+   */
+  protected function getFactory() {
+    return new FlysystemFactory($this->plugin_manager->reveal(), $this->filesystem->reveal(), $this->cache, $this->logger);
   }
 
 }

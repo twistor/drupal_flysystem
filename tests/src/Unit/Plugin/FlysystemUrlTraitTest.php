@@ -7,11 +7,15 @@
 
 namespace NoDrupal\Tests\flysystem\Unit\Plugin;
 
+use Drupal\Core\Routing\UrlGenerator;
+use Drupal\Tests\UnitTestCase;
+use Drupal\flysystem\Plugin\FlysystemUrlTrait;
+
 /**
  * @coversDefaultClass \Drupal\flysystem\Plugin\FlysystemUrlTrait
  * @group flysystem
  */
-class FlysystemUrlTraitTest extends \PHPUnit_Framework_TestCase {
+class FlysystemUrlTraitTest extends UnitTestCase {
 
   /**
    * @covers ::getExternalUrl
@@ -19,8 +23,8 @@ class FlysystemUrlTraitTest extends \PHPUnit_Framework_TestCase {
    * @covers ::getTarget
    */
   public function testGetExternalUrl() {
-    $trait = $this->getMockForTrait('Drupal\flysystem\Plugin\FlysystemUrlTrait');
-    $url_generator = $this->prophesize('Drupal\Core\Routing\UrlGenerator');
+    $trait = $this->getMockForTrait(FlysystemUrlTrait::class);
+    $url_generator = $this->prophesize(UrlGenerator::class);
     $url_generator->generateFromRoute(
       'flysystem.serve',
       ['scheme' => 'testscheme', 'filepath' => 'dir/file.txt'],

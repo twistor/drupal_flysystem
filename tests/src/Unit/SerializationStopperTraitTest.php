@@ -7,11 +7,14 @@
 
 namespace Drupal\Tests\flysystem\Unit;
 
+use Drupal\Tests\UnitTestCase;
+use Drupal\flysystem\SerializationStopperTrait;
+
 /**
  * @coversDefaultClass \Drupal\flysystem\SerializationStopperTrait
  * @group flysystem
  */
-class SerializationStopperTraitTest extends \PHPUnit_Framework_TestCase {
+class SerializationStopperTraitTest extends UnitTestCase {
 
   /**
    * @covers ::__sleep
@@ -20,7 +23,7 @@ class SerializationStopperTraitTest extends \PHPUnit_Framework_TestCase {
    * @expectedExceptionMessage can not be serialized.
    */
   public function test() {
-    $trait = $this->getMockForTrait('Drupal\flysystem\SerializationStopperTrait');
+    $trait = $this->getMockForTrait(SerializationStopperTrait::class);
     serialize($trait);
   }
 

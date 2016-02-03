@@ -8,35 +8,60 @@
 namespace NoDrupal\Tests\flysystem\Unit;
 
 use Drupal\Core\Cache\MemoryBackend;
+use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\DrupalFlysystemCache;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\DrupalFlysystemCache
  * @group flysystem
  */
-class DrupalFlysystemCacheTest extends \PHPUnit_Framework_TestCase {
+class DrupalFlysystemCacheTest extends UnitTestCase {
 
   /**
-   * @covers \Drupal\flysystem\DrupalFlysystemCache
+   * @var \Drupal\Core\Cache\CacheBackendInterface
    */
-  public function test() {
-    $backend = new MemoryBackend('test');
-    $cache = new DrupalFlysystemCache($backend, 'flysystem');
-    $cache->load();
+  protected $backend;
 
-    $contents = [['path' => 'test.txt']];
-    $cache->storeContents('', $contents);
-    $this->assertTrue($cache->has('test.txt'));
+  /**
+   * @var \League\Flysystem\Cached\CacheInterface
+   */
+  protected $cache;
 
-    $this->assertSame('test.txt', key($backend->get('flysystem')->data[0]));
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
+    parent::setUp();
 
-    // Test loading.
-    $cache = new DrupalFlysystemCache($backend, 'flysystem');
-    $this->assertNull($cache->has('test.txt'));
+    $this->backend = new MemoryBackend('test');
+    $this->cache = new DrupalFlysystemCache($this->backend, 'flysystem');
+  }
 
-    $cache->load();
-    $this->assertTrue($cache->has('test.txt'));
-    $this->assertFalse($cache->has('missing.txt'));
+  /**
+   * @covers ::load
+   * @covers ::__construct
+   */
+  public function testLoadKeyExists() {
+    $this->backend->set('flysystem', [['test.txt' => true], []]);
+    $this->cache->load();
+    $this->assertTrue($this->cache->has('test.txt'));
+  }
+
+  /**
+   * @covers ::load
+   */
+  public function testLoadKeyDoesntExist() {
+    $this->cache->load();
+    $this->assertNull($this->cache->has('test.txt'));
+  }
+
+  /**
+   * @covers ::save
+   */
+  public function testSavePersistsToCache() {
+    $this->cache->updateObject('test.txt', ['size' => 10]);
+    $this->cache->save();
+    $this->assertTrue(isset($this->backend->get('flysystem')->data[0]['test.txt']));
   }
 
 }

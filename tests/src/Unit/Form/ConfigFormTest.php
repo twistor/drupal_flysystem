@@ -9,11 +9,15 @@ namespace NoDrupal\Tests\flysystem\Unit\Form {
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Tests\UnitTestCase;
+use Drupal\flysystem\FlysystemFactory;
 use Drupal\flysystem\Form\ConfigForm;
 use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Memory\MemoryAdapter;
 use Prophecy\Argument;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -42,7 +46,7 @@ class ConfigFormTest extends UnitTestCase {
   public function setUp() {
     parent::setUp();
 
-    $this->factory = $this->prophesize('Drupal\flysystem\FlysystemFactory');
+    $this->factory = $this->prophesize(FlysystemFactory::class);
     $this->factory->getFilesystem('from_empty')->willReturn(new Filesystem(new MemoryAdapter()));
     $this->factory->getFilesystem('to_empty')->willReturn(new Filesystem(new MemoryAdapter()));
     $this->factory->getSchemes()->willReturn(['from_empty', 'to_empty']);
@@ -54,8 +58,8 @@ class ConfigFormTest extends UnitTestCase {
     $container->set('string_translation', $this->getStringTranslationStub());
     $container->set('flysystem_factory', $this->factory->reveal());
 
-    $logger = $this->prophesize('Drupal\Core\Logger\LoggerChannelFactoryInterface');
-    $logger->get('flysystem')->willReturn($this->prophesize('Psr\Log\LoggerInterface')->reveal());
+    $logger = $this->prophesize(LoggerChannelFactoryInterface::class);
+    $logger->get('flysystem')->willReturn($this->prophesize(LoggerInterface::class)->reveal());
     $container->set('logger.factory', $logger->reveal());
 
     \Drupal::setContainer($container);
@@ -69,7 +73,7 @@ class ConfigFormTest extends UnitTestCase {
     $container = new ContainerBuilder();
     $container->set('flysystem_factory', $this->factory->reveal());
 
-    $this->assertInstanceOf('Drupal\flysystem\Form\ConfigForm', ConfigForm::create($container));
+    $this->assertInstanceOf(ConfigForm::class, ConfigForm::create($container));
   }
 
   /**
@@ -123,7 +127,7 @@ class ConfigFormTest extends UnitTestCase {
 
     $this->form->submitForm($form, $form_state);
     $batch = batch_set();
-    $this->assertSame('Drupal\flysystem\Form\ConfigForm::finishBatch', $batch['finished']);
+    $this->assertSame(ConfigForm::class . '::finishBatch', $batch['finished']);
     $this->assertSame(0, count($batch['operations']));
 
     // Test with existing source files.
@@ -178,7 +182,7 @@ class ConfigFormTest extends UnitTestCase {
   public function testCopyFileFailedRead() {
     // Tests failed read.
     $context = [];
-    $failed_read = $this->prophesize('League\Flysystem\FilesystemInterface');
+    $failed_read = $this->prophesize(FilesystemInterface::class);
     $failed_read->readStream('does_not_exist')->willReturn(FALSE);
     $this->factory->getFilesystem('failed_read')->willReturn($failed_read->reveal());
 
@@ -199,7 +203,7 @@ class ConfigFormTest extends UnitTestCase {
     $from->write('test.txt', 'abcdefg');
     $this->factory->getFilesystem('from_files')->willReturn($from);
 
-    $failed_write = $this->prophesize('League\Flysystem\FilesystemInterface');
+    $failed_write = $this->prophesize(FilesystemInterface::class);
     $failed_write->putStream(Argument::cetera())->willReturn(FALSE);
     $this->factory->getFilesystem('to_fail')->willReturn($failed_write);
 

@@ -7,8 +7,10 @@
 
 namespace Drupal\Tests\flysystem\Unit\Asset {
 
+use Drupal\Core\Asset\AssetCollectionGrouperInterface;
 use Drupal\Core\Asset\CssOptimizer;
 use Drupal\Core\Asset\JsOptimizer;
+use Drupal\Core\State\StateInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\Asset\AssetDumper;
 use Drupal\flysystem\Asset\CssCollectionOptimizer;
@@ -65,9 +67,9 @@ class JsCollectionOptimizerTest extends UnitTestCase {
 
     \Drupal::setContainer($container);
 
-    $grouper = $this->prophesize('Drupal\Core\Asset\AssetCollectionGrouperInterface');
+    $grouper = $this->prophesize(AssetCollectionGrouperInterface::class);
     $dumper = new AssetDumper();
-    $state = $this->getMock('Drupal\Core\State\StateInterface');
+    $state = $this->getMock(StateInterface::class);
 
     $optimizer = new JsCollectionOptimizer($grouper->reveal(), new JsOptimizer(), $dumper, $state);
 

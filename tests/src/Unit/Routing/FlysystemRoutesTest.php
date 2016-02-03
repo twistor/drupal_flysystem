@@ -15,6 +15,8 @@ use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\FlysystemFactory;
 use Drupal\flysystem\Routing\FlysystemRoutes;
+use Drupal\image\Controller\ImageStyleDownloadController;
+use Drupal\system\FileDownloadController;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -24,11 +26,24 @@ use Symfony\Component\Routing\Route;
 class FlysystemRoutesTest extends UnitTestCase {
 
   /**
-   * @covers ::__construct
-   * @covers ::create
-   * @covers ::routes
+   * @var \Drupal\flysystem\FlysystemFactory
    */
-  public function testRoutes() {
+  protected $factory;
+
+  /**
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
+   * @var \Drupal\flysystem\Routing\FlysystemRoutes
+   */
+  protected $router;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
     $container = new ContainerBuilder();
 
     $stream_wrapper = $this->prophesize(LocalStream::class);
@@ -37,27 +52,55 @@ class FlysystemRoutesTest extends UnitTestCase {
     $stream_wrapper_manager = $this->prophesize(StreamWrapperManagerInterface::class);
     $stream_wrapper_manager->getViaScheme('public')->willReturn($stream_wrapper->reveal());
 
-    $module_handler = $this->prophesize(ModuleHandlerInterface::class);
+    $this->moduleHandler = $this->prophesize(ModuleHandlerInterface::class);
 
     $factory = $this->prophesize(FlysystemFactory::class);
+    $factory->getSchemes()->willReturn(['test']);
 
     $container->set('flysystem_factory', $factory->reveal());
     $container->set('stream_wrapper_manager', $stream_wrapper_manager->reveal());
-    $container->set('module_handler', $module_handler->reveal());
+    $container->set('module_handler', $this->moduleHandler->reveal());
 
-    $router = FlysystemRoutes::create($container);
+    $this->router = FlysystemRoutes::create($container);
+  }
 
-    new Settings(['flysystem' => ['test' => ['driver' => 'local']]]);
-    $factory->getSchemes()->willReturn([]);
-    $this->assertSame([], $router->routes());
+  /**
+   * @covers ::__construct
+   * @covers ::create
+   * @covers ::routes
+   */
+  public function testInvalidSettingsAreSkipped() {
+    new Settings(['flysystem' => [
+      'invalid' => ['driver' => 'local'],
+      'test' => ['driver' => 'local'],
+    ]]);
 
-    $factory->getSchemes()->willReturn(['test']);
-    new Settings(['flysystem' => ['test' => ['driver' => 'local']]]);
-    $this->assertSame([], $router->routes());
+    $this->assertSame([], $this->router->routes());
+  }
+
+  /**
+   * @covers ::routes
+   */
+  public function testInvalidDriversAreSkipped() {
     new Settings(['flysystem' => ['test' => ['driver' => 'ftp']]]);
-    $this->assertSame([], $router->routes());
 
-    $schemes = [
+    $this->assertSame([], $this->router->routes());
+  }
+
+  /**
+   * @covers ::routes
+   */
+  public function testDriversNotPublicAreSkipped() {
+    new Settings(['flysystem' => ['test' => ['driver' => 'local']]]);
+
+    $this->assertSame([], $this->router->routes());
+  }
+
+  /**
+   * @covers ::routes
+   */
+  public function testLocalPathSameAsPublicIsSkipped() {
+    new Settings(['flysystem' => [
       'test' => [
         'driver' => 'local',
         'public' => TRUE,
@@ -66,17 +109,30 @@ class FlysystemRoutesTest extends UnitTestCase {
           'root' => 'sites/default/files',
         ],
       ],
-    ];
-    new Settings(['flysystem' => $schemes]);
-    $this->assertSame([], $router->routes());
+    ]]);
 
-    $schemes['test']['config']['root'] = 'sites/default/files/flysystem';
-    new Settings(['flysystem' => $schemes]);
+    $this->assertSame([], $this->router->routes());
+  }
+
+  /**
+   * @covers ::routes
+   */
+  public function testValidRoutesReturned() {
+    new Settings(['flysystem' => [
+      'test' => [
+        'driver' => 'local',
+        'public' => TRUE,
+        'config' => [
+          'public' => TRUE,
+          'root' => 'sites/default/files/flysystem',
+        ],
+      ],
+    ]]);
 
     $expected = new Route(
       '/sites/default/files/flysystem',
       [
-        '_controller' => 'Drupal\system\FileDownloadController::download',
+        '_controller' => FileDownloadController::class . '::download',
         'scheme' => 'test',
       ],
       [
@@ -84,15 +140,41 @@ class FlysystemRoutesTest extends UnitTestCase {
       ]
     );
 
-    $routes = $router->routes();
+    $routes = $this->router->routes();
     $this->assertSame(1, count($routes));
     $this->assertSame($expected->serialize(), $routes['flysystem.test.serve']->serialize());
+  }
 
-    // Enable image module.
-    $module_handler->moduleExists('image')->willReturn(TRUE);
-    $routes = $router->routes();
+  /**
+   * @covers ::routes
+   */
+  public function testValidRoutesReturnedWithImageModule() {
+    new Settings(['flysystem' => [
+      'test' => [
+        'driver' => 'local',
+        'public' => TRUE,
+        'config' => [
+          'public' => TRUE,
+          'root' => 'sites/default/files/flysystem',
+        ],
+      ],
+    ]]);
+
+    $expected = new Route(
+      '/_flysystem/styles/{image_style}/{scheme}',
+      [
+        '_controller' => ImageStyleDownloadController::class . '::deliver',
+      ],
+      [
+        '_access' => 'TRUE',
+        'scheme' => '^[a-zA-Z0-9+.-]+$',
+      ]
+    );
+
+    $this->moduleHandler->moduleExists('image')->willReturn(TRUE);
+    $routes = $this->router->routes();
     $this->assertSame(3, count($routes));
-    $this->assertSame($expected->serialize(), $routes['flysystem.test.serve']->serialize());
+    $this->assertSame($expected->serialize(), $routes['flysystem.image_style']->serialize());
   }
 
 }

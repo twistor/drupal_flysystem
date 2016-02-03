@@ -7,10 +7,13 @@
 
 namespace Drupal\Tests\flysystem\Unit;
 
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
+use Drupal\flysystem\FlysystemFactory;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 use org\bovigo\vfs\vfsStream;
 
 /**
@@ -36,15 +39,16 @@ class ModuleFunctionsTest extends UnitTestCase {
 
     require_once dirname(dirname(dirname(__DIR__))) . '/flysystem.module';
 
-    $this->factory = $this->prophesize('Drupal\flysystem\FlysystemFactory');
+    $this->factory = $this->prophesize(FlysystemFactory::class);
+    $this->factory->getSchemes()->willReturn(['vfs']);
 
-    $file_system_helper = $this->prophesize('Drupal\Core\File\FileSystemInterface');
+    $file_system_helper = $this->prophesize(FileSystemInterface::class);
     $file_system_helper->uriScheme(Argument::type('string'))->will(function ($uri) {
       list($scheme) = explode('://', $uri[0]);
       return $scheme;
     });
 
-    $guesser = $this->prophesize('Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface');
+    $guesser = $this->prophesize(MimeTypeGuesserInterface::class);
     $guesser->guess(Argument::type('string'))->willReturn('txt/flysystem');
 
     $container = new ContainerBuilder();
@@ -56,29 +60,25 @@ class ModuleFunctionsTest extends UnitTestCase {
   }
 
   /**
-   * Tests flysystem_cron().
+   * Tests flysystem_cron() calls ensure.
    */
-  public function testFlysystemCron() {
+  public function testFlysystemCronCallsEnsure() {
     $this->factory->ensure()->shouldBeCalled();
     flysystem_cron();
   }
 
   /**
-   * Tests flysystem_rebuild().
+   * Tests flysystem_rebuild() calls ensure.
    */
-  public function testFlysystemRebuild() {
+  public function testFlysystemRebuildCallsEnsure() {
     $this->factory->ensure()->shouldBeCalled();
     flysystem_rebuild();
   }
 
   /**
-   * Tests flysystem_file_download().
+   * Tests flysystem_file_download() handles valid schemes.
    */
-  public function testFlysystemFileDownload() {
-    $this->factory->getSchemes()->willReturn(['vfs']);
-
-    $this->assertNull(flysystem_file_download('invalid://module_file/file.txt'));
-
+  public function testFlysystemFileDownloadFindsValidScheme() {
     file_put_contents('vfs://module_file/file.txt', '1234');
 
     $return = flysystem_file_download('vfs://module_file/file.txt');
@@ -86,6 +86,13 @@ class ModuleFunctionsTest extends UnitTestCase {
     $this->assertSame(2, count($return));
     $this->assertSame('txt/flysystem', $return['Content-Type']);
     $this->assertSame(4, $return['Content-Length']);
+  }
+
+  /**
+   * Tests flysystem_file_download() ignores invalid schemes.
+   */
+  public function testFlysystemFileDownloadIgnoresInvalidScheme() {
+    $this->assertNull(flysystem_file_download('invalid://module_file/file.txt'));
   }
 
 }

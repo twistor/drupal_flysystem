@@ -8,13 +8,15 @@
 namespace Drupal\Tests\flysystem\Unit\Plugin;
 
 use Drupal\Core\Cache\MemoryBackend;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\Plugin\FlysystemPluginManager;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\Plugin\FlysystemPluginManager
  * @group flysystem
  */
-class FlysystemPluginManagerTest extends \PHPUnit_Framework_TestCase {
+class FlysystemPluginManagerTest extends UnitTestCase {
 
   /**
    * @covers \Drupal\flysystem\Plugin\FlysystemPluginManager
@@ -22,7 +24,7 @@ class FlysystemPluginManagerTest extends \PHPUnit_Framework_TestCase {
   public function test() {
     $namespaces = new \ArrayObject();
     $cache_backend = new MemoryBackend('bin');
-    $module_handle = $this->getMock('Drupal\Core\Extension\ModuleHandlerInterface');
+    $module_handle = $this->getMock(ModuleHandlerInterface::class);
 
     $manager = new FlysystemPluginManager($namespaces, $cache_backend, $module_handle);
     $this->assertSame('missing', $manager->getFallbackPluginId('beep'));
