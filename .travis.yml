@@ -12,17 +12,20 @@ matrix:
 install:
   - composer self-update
   - cd ..
-  - git clone --depth 1 --branch 8.0.x http://git.drupal.org/project/drupal.git
+
+  - git clone --depth 1 --branch 8.0.x https://git.drupal.org/project/drupal.git
+  - git clone --depth 1 --branch 8.x-1.x https://git.drupal.org/project/composer_manager.git
+
+  - mv composer_manager drupal/modules/composer_manager
   - mv drupal_flysystem drupal/modules/flysystem
+
   - cd drupal
 
-script:
-  - travis_retry composer require league/flysystem ^1.0.3 --prefer-source
-  - travis_retry composer require league/flysystem-cached-adapter ~1.0 --prefer-source
-  - travis_retry composer require league/flysystem-memory ~1.0 --prefer-source
-  - travis_retry composer require league/flysystem-replicate-adapter ~1.0 --prefer-source
-  - travis_retry composer require twistor/flysystem-stream-wrapper ^1.0.5 --prefer-source
+  - php modules/composer_manager/scripts/init.php
+  - composer drupal-rebuild
+  - composer update --lock --prefer-source
 
+script:
   - cd modules/flysystem
   - ../../vendor/bin/phpunit
 
