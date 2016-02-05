@@ -65,11 +65,10 @@ $schemes = [
                                                // Drupal's private file system.
       // Or.
 
-      'root' => 'sites/default/files/flysystem', // If the directory is inside
-      'public' => TRUE,                          // the public directory, and
-    ],                                           // public is set to TRUE,
-                                                 // files will be served
-                                                 // directly.
+      'root' => 'sites/default/files/flysystem',
+      'public' => TRUE,                          // In order for the public setting to work,
+                                                 // the path must be relative to the root
+                                                 // of the Drupal install.
 
     // Optional settings that apply to all adapters.
 
