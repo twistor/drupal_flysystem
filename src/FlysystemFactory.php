@@ -75,7 +75,7 @@ class FlysystemFactory {
    *
    * @var array
    */
-  protected $settings;
+  protected $settings = [];
 
   /**
    * Constructs a FlysystemFactory object.
