@@ -12,6 +12,7 @@ use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\FlysystemFactory;
 use League\Flysystem\Filesystem;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Twistor\FlysystemStreamWrapper;
 
 /**
  * Tests flysystem.install functions.
@@ -60,14 +61,18 @@ class InstallFunctionsTest extends UnitTestCase {
    * Tests flysystem_requirements() handles install.
    */
   public function testFlysystemRequirementsHandlesInstall() {
+    $dependencies_exist = (int) class_exists(FlysystemStreamWrapper::class);
+
     $return = flysystem_requirements('install');
-    $this->assertSame(0, count($return));
+    $this->assertSame(1 - $dependencies_exist, count($return));
   }
 
   /**
    * Tests flysystem_requirements() handles runtime.
    */
   public function testFlysystemRequirementsHandlesRuntime() {
+    $dependencies_exist = (int) class_exists(FlysystemStreamWrapper::class);
+
     $this->factory->ensure()->willReturn([
       'testscheme' => [[
         'message' => 'Test message',
@@ -78,7 +83,7 @@ class InstallFunctionsTest extends UnitTestCase {
 
     $return = flysystem_requirements('runtime');
 
-    $this->assertSame(1, count($return));
+    $this->assertSame(2 - $dependencies_exist, count($return));
     $this->assertSame('Test message', (string) $return['flysystem:testscheme']['description']);
   }
 
