@@ -155,6 +155,14 @@ class FlysystemFactoryTest extends UnitTestCase {
   }
 
   /**
+   * @covers ::getSchemes
+   */
+  public function testGetSchemesHandlesNoSchemes() {
+    new Settings([]);
+    $this->assertSame([], $this->getFactory()->getSchemes());
+  }
+
+  /**
    * @covers ::ensure
    */
   public function testEnsureReturnsErrors() {
