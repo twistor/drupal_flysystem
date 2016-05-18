@@ -1,4 +1,11 @@
 services:
+  cache.flysystem:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: cache_factory:get
+    arguments: [flysystem]
+
   logger.channel.flysystem:
     parent: logger.channel_base
     arguments: ['flysystem']
@@ -9,7 +16,7 @@ services:
 
   flysystem_factory:
     class: Drupal\flysystem\FlysystemFactory
-    arguments: ['@plugin.manager.flysystem', '@file_system', '@cache.default', '@logger.channel.flysystem']
+    arguments: ['@plugin.manager.flysystem', '@file_system', '@cache.flysystem', '@logger.channel.flysystem']
 
   path_processor.flysystem:
     class: Drupal\flysystem\PathProcessor\FlysystemPathProcessor

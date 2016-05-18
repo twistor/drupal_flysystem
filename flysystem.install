@@ -19,7 +19,6 @@ function flysystem_requirements($phase) {
 
   $dependencies = [
     'League\Flysystem\Filesystem' => \Drupal::translation()->translate('Flysystem'),
-    'League\Flysystem\Cached\CachedAdapter' => \Drupal::translation()->translate('cache adapter'),
     'League\Flysystem\Replicate\ReplicateAdapter' => \Drupal::translation()->translate('replicate adapter'),
     'Twistor\FlysystemStreamWrapper' => \Drupal::translation()->translate('stream wrapper'),
   ];

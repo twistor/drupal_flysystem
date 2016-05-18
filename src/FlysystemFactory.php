@@ -1,17 +1,13 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\FlysystemFactory.
- */
-
 namespace Drupal\flysystem;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Site\Settings;
-use League\Flysystem\Cached\CachedAdapter;
+use Drupal\flysystem\Flysystem\Adapter\CacheItemBackend;
+use Drupal\flysystem\Flysystem\Adapter\DrupalCacheAdapter;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Replicate\ReplicateAdapter;
 use Psr\Log\LoggerInterface;
@@ -196,8 +192,8 @@ class FlysystemFactory {
     }
 
     if ($settings['cache']) {
-      $cache = new DrupalFlysystemCache($this->cacheBackend, 'flysystem:' . $scheme);
-      $adapter = new CachedAdapter($adapter, $cache);
+      $cache_item_backend = new CacheItemBackend($scheme, $this->cacheBackend);
+      $adapter = new DrupalCacheAdapter($scheme, $adapter, $cache_item_backend);
     }
 
     return $adapter;
