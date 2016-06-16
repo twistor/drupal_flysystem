@@ -8,32 +8,20 @@ Reducing technical debt and chance of vendor lock-in.
 ## REQUIREMENTS ##
 
 - Composer (https://getcomposer.org)
-- (optional) Composer manager (https://www.drupal.org/project/composer_manager)
-  If you have a different method of managing Composer dependencies, use that.
 
 ## INSTALLATION ##
 
 These are the steps you need to take in order to use this software. Order is
 important.
 
-Note: If you're not using composer_manager, then use whatever you normally use
-to manage dependencies, and just install this module.
-
- 1. Download composer_manager.
- 2. Download flysystem.
- 3. Initialize composer_manager:
- 4. Update composer dependencies.
- 5. Install Flysystem.
- 6. Enjoy.
-
-Steps performed from the root of the Drupal install. Module locations may vary.
+ 1. Download and install flysystem's module and its dependencies.
+ 2. Install flysystem module.
+ 3. Enjoy.
 
 ```bash
-drush dl composer_manager flysystem
-php modules/composer_manager/scripts/init.php
-composer drupal-rebuild
-composer update --lock
-drush en flysystem -y
+cd /path/to/drupal/root
+composer require drupal/flysystem
+drush en flysystem
 ```
 
 ## CONFIGURATION ##
