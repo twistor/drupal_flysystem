@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Flysystem\Local.
- */
-
 namespace Drupal\flysystem\Flysystem;
 
 use Drupal\Component\PhpStorage\FileStorage;

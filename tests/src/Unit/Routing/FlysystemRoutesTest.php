@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \NoDrupal\Tests\flysystem\Unit\Routing\FlysystemRoutesTest.
- */
-
 namespace NoDrupal\Tests\flysystem\Unit\Routing;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;

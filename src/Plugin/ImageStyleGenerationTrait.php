@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Plugin\ImageStyleGenerationTrait.
- */
-
 namespace Drupal\flysystem\Plugin;
 
 use Drupal\Component\Utility\Crypt;

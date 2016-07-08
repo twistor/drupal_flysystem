@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\flysystem\Unit\FlysystemServiceProviderTest.
- */
-
 namespace Drupal\Tests\flysystem\Unit;
 
 use Drupal\Core\Asset\AssetDumper;

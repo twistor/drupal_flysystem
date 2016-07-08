@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \NoDrupal\Tests\flysystem\Unit\Plugin\ImageStyleGenerationTraitTest.
- */
-
 namespace NoDrupal\Tests\flysystem\Unit\Plugin;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;

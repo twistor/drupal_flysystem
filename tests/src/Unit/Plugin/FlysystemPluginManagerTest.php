@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\flysystem\Unit\Plugin\FlysystemPluginManagerTest.
- */
-
 namespace Drupal\Tests\flysystem\Unit\Plugin;
 
 use Drupal\Core\Cache\MemoryBackend;

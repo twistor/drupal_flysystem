@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Logger\Convert.
- */
-
 namespace Drupal\flysystem\Logger;
 
 use Drupal\Core\Logger\RfcLogLevel;

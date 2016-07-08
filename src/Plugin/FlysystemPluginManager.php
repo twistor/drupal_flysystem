@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Plugin\FlysystemPluginManager.
- */
-
 namespace Drupal\flysystem\Plugin;
 
 use Drupal\Component\Plugin\FallbackPluginManagerInterface;

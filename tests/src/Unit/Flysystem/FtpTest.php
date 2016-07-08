@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \NoDrupal\Tests\flysystem\Unit\Flysystem\FtpTest.
- */
-
 namespace NoDrupal\Tests\flysystem\Unit\Flysystem {
 
 use Drupal\Tests\UnitTestCase;

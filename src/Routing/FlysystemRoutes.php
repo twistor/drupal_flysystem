@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Routing\FlysystemRoutes.
- */
-
 namespace Drupal\flysystem\Routing;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;

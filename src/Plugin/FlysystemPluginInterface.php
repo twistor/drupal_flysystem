@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Plugin\FlysystemPluginInterface.
- */
-
 namespace Drupal\flysystem\Plugin;
 
 interface FlysystemPluginInterface {

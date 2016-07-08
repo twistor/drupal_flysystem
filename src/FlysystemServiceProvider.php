@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\FlysystemServiceProvider.
- */
-
 namespace Drupal\flysystem;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;

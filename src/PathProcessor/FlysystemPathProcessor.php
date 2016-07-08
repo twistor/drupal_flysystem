@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\PathProcessor\FlysystemPathProcessor.
- */
-
 namespace Drupal\flysystem\PathProcessor;
 
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;

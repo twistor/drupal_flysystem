@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Plugin\FlysystemUrlTrait.
- */
-
 namespace Drupal\flysystem\Plugin;
 
 use Drupal\Core\Routing\UrlGeneratorTrait;

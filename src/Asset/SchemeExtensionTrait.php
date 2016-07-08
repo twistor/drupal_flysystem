@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Asset\SchemeExtensionTrait.
- */
-
 namespace Drupal\flysystem\Asset;
 
 use Drupal\Core\Site\Settings;

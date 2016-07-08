@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Asset\AssetDumper.
- */
-
 namespace Drupal\flysystem\Asset;
 
 use Drupal\Component\Utility\Crypt;

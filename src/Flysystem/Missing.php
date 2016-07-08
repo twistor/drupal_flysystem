@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Flysystem\Missing.
- */
-
 namespace Drupal\flysystem\Flysystem;
 
 use Drupal\Core\Logger\RfcLogLevel;

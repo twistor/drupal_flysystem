@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Annotation\Adapter.
- */
-
 namespace Drupal\flysystem\Annotation;
 
 use Drupal\Component\Annotation\Plugin;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\flysystem\Unit\InstallFunctionsTest.
- */
-
 namespace Drupal\Tests\flysystem\Unit;
 
 use Drupal\Core\Logger\RfcLogLevel;

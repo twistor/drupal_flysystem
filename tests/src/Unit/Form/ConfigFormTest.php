@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \NoDrupal\Tests\flysystem\Unit\Form\ConfigFormTest.
- */
-
 namespace NoDrupal\Tests\flysystem\Unit\Form {
 
 use Drupal\Component\Utility\SafeMarkup;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\flysystem\Unit\PathProcessor\FlysystemPathProcessorTest.
- */
-
 namespace Drupal\Tests\flysystem\Unit\PathProcessor;
 
 use Drupal\Tests\UnitTestCase;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Flysystem\Ftp.
- */
-
 namespace Drupal\flysystem\Flysystem;
 
 use Drupal\Core\Logger\RfcLogLevel;

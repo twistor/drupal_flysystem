@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Tests\ModuleInstallUninstallWebTest.
- */
-
 namespace Drupal\flysystem\Tests;
 
 use Drupal\simpletest\WebTestBase;

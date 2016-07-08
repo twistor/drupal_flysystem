@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Flysystem\Adapter\MissingAdapter.
- */
-
 namespace Drupal\flysystem\Flysystem\Adapter;
 
 use League\Flysystem\AdapterInterface;

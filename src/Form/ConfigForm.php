@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\Form\ConfigForm.
- */
-
 namespace Drupal\flysystem\Form;
 
 use Drupal\Component\Utility\SafeMarkup;

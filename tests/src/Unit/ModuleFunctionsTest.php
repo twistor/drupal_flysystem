@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\flysystem\Unit\ModuleFunctionsTest.
- */
-
 namespace Drupal\Tests\flysystem\Unit;
 
 use Drupal\Core\File\FileSystemInterface;

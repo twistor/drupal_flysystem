@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\flysystem\Unit\SerializationStopperTraitTest.
- */
-
 namespace Drupal\Tests\flysystem\Unit;
 
 use Drupal\Tests\UnitTestCase;

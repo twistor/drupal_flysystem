@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \NoDrupal\Tests\flysystem\Unit\Plugin\FlysystemUrlTraitTest.
- */
-
 namespace NoDrupal\Tests\flysystem\Unit\Plugin;
 
 use Drupal\Core\Routing\UrlGenerator;

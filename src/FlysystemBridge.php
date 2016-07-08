@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\flysystem\FlysystemBridge.
- */
-
 namespace Drupal\flysystem;
 
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;

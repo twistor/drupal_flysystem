@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \NoDrupal\Tests\flysystem\Unit\FlysystemBridgeTest.
- */
-
 namespace NoDrupal\Tests\flysystem\Unit;
 
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;

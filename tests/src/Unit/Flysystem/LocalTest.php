@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \NoDrupal\Tests\flysystem\Unit\Flysystem\LocalTest.
- */
-
 namespace NoDrupal\Tests\flysystem\Unit\Flysystem;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;

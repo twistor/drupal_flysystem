@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\flysystem\Unit\Asset\SchemeExtensionTraitTest.
- */
-
 namespace Drupal\Tests\flysystem\Unit\Asset;
 
 use Drupal\Core\Site\Settings;

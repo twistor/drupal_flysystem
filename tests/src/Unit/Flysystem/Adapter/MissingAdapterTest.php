@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \NoDrupal\Tests\flysystem\Unit\Flysystem\Adapter\MissingAdapterTest.
- */
-
 namespace NoDrupal\Tests\flysystem\Unit\Flysystem\Adapter;
 
 use Drupal\Tests\UnitTestCase;

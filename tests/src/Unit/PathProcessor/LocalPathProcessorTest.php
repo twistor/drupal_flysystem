@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\flysystem\Unit\PathProcessor\LocalPathProcessorTest.
- */
-
 namespace Drupal\Tests\flysystem\Unit\PathProcessor;
 
 use Drupal\Core\Site\Settings;

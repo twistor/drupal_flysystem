@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\flysystem\Unit\Asset\JsCollectionOptimizerTest.
- */
-
 namespace Drupal\Tests\flysystem\Unit\Asset {
 
 use Drupal\Core\Asset\AssetCollectionGrouperInterface;
