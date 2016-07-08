@@ -24,11 +24,24 @@ composer require drupal/flysystem
 drush en flysystem
 ```
 
+## TROUBLESHOOTING ##
+
+If you are having trouble with this module, check the status page at
+admin/reports/status. The status page runs all the Flysystem checks and provides
+useful error reporting.
+
 ## CONFIGURATION ##
 
-Stream wrappers are configured in settings.php. The keys (localexample) are the
-names of the stream wrappers. For example: 'localexample://filename.txt'
-The 'driver' key, is the type of adapter. Available adapters are:
+Stream wrappers are configured in settings.php.
+
+The keys (local-example below) are the names of the stream wrappers.
+
+For example: 'local-example://filename.txt'.
+
+Stream wrapper names cannot contain underscores, they can only contain letters,
+numbers, + (plus sign), . (period), - (hyphen).
+
+The 'driver' key, is the type of adapter. The available adapters are:
 
  - local
  - ftp (Requires the ftp extension)
@@ -44,7 +57,7 @@ Example configuration:
 
 ```php
 $schemes = [
-  'localexample' => [            // The name of the stream wrapper. localexample://
+  'local-example' => [           // The name of the stream wrapper.
 
     'driver' => 'local',         // The plugin key.
 
