@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\flysystem\EditorFileReference;
+
 /**
  * @file
  * Provides access to various filesystem backends using Flysystem.
@@ -34,4 +36,13 @@ function flysystem_file_download($uri) {
     'Content-Type' => Drupal::service('file.mime_type.guesser.extension')->guess($uri),
     'Content-Length' => filesize($uri),
   ];
+}
+
+/**
+ * Implements hook_filter_info_alter().
+ */
+function flysystem_filter_info_alter(array &$info) {
+  if (isset($info['editor_file_reference'])) {
+    $info['editor_file_reference']['class'] = EditorFileReference::class;
+  }
 }
