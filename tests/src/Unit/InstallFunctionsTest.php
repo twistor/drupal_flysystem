@@ -3,6 +3,7 @@
 namespace Drupal\Tests\flysystem\Unit;
 
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\FlysystemFactory;
 use League\Flysystem\Filesystem;
@@ -48,8 +49,10 @@ class InstallFunctionsTest extends UnitTestCase {
    * Tests flysystem_requirements() handles update.
    */
   public function testFlysystemRequirementsHandlesUpdate() {
+    $dependencies_exist = (int) class_exists(FlysystemStreamWrapper::class);
+
     $return = flysystem_requirements('update');
-    $this->assertSame(0, count($return));
+    $this->assertSame(1 - $dependencies_exist, count($return));
   }
 
   /**
@@ -80,6 +83,16 @@ class InstallFunctionsTest extends UnitTestCase {
 
     $this->assertSame(2 - $dependencies_exist, count($return));
     $this->assertSame('Test message', (string) $return['flysystem:testscheme']['description']);
+  }
+
+  /**
+   * Tests flysystem_requirements() detects invalid schemes.
+   */
+  public function testFlysystemRequirementsHandlesInvalidSchemes() {
+    new Settings(['flysystem' => ['test_scheme' => []]]);
+    $requirements = flysystem_requirements('update');
+
+    $this->assertTrue(isset($requirements['flysystem_invalid_scheme']));
   }
 
   /**

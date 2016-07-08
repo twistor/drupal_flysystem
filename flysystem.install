@@ -5,6 +5,7 @@
  * Install, update and uninstall functions for the flysystem module.
  */
 
+use Drupal\Core\Site\Settings;
 use Drupal\flysystem\Logger\Convert;
 
 /**
@@ -13,10 +14,47 @@ use Drupal\flysystem\Logger\Convert;
 function flysystem_requirements($phase) {
   $requirements = [];
 
-  if ($phase !== 'runtime' && $phase !== 'install') {
-    return $requirements;
+  __flysystem_validate_schemes($requirements);
+  __flysystem_check_dependencies($requirements);
+
+  if ($phase === 'runtime') {
+    __flysystem_call_ensure($requirements);
   }
 
+  return $requirements;
+}
+
+/**
+ * Implements hook_install().
+ */
+function flysystem_install() {
+  Drupal::service('flysystem_factory')->ensure();
+}
+
+/**
+ * Validates configured schemes.
+ */
+function __flysystem_validate_schemes(array &$requirements) {
+  $invalid = [];
+  foreach (array_keys(Settings::get('flysystem', [])) as $scheme) {
+    if (!preg_match('/^[a-zA-Z0-9+.-]+$/', $scheme)) {
+      $invalid[] = $scheme;
+    }
+  }
+
+  if ($invalid) {
+    $requirements['flysystem_invalid_scheme'] = [
+      'title' => \Drupal::translation()->translate('Invalid Flysystem schemes in settings.php'),
+      'description' => \Drupal::translation()->translate("The following schemes are not in the correct format: %schemes. Scheme names can only contain letters, numbers, + (plus sign), . (period), - (hyphen).", ['%schemes' => implode(', ', $invalid)]),
+      'severity' => REQUIREMENT_ERROR,
+    ];
+  }
+}
+
+/**
+ * Checks that dependencies are installed.
+ */
+function __flysystem_check_dependencies(array &$requirements) {
   $dependencies = [
     'League\Flysystem\Filesystem' => \Drupal::translation()->translate('Flysystem'),
     'League\Flysystem\Replicate\ReplicateAdapter' => \Drupal::translation()->translate('replicate adapter'),
@@ -36,11 +74,12 @@ function flysystem_requirements($phase) {
     ];
   }
   // @codeCoverageIgnoreEnd
+}
 
-  if ($phase !== 'runtime') {
-    return $requirements;
-  }
-
+/**
+ * Checks the state of existing configuratio.
+ */
+function __flysystem_call_ensure(array &$requirements) {
   foreach (\Drupal::service('flysystem_factory')->ensure() as $scheme => $errors) {
     foreach ($errors as $error) {
       $requirements['flysystem:' . $scheme] = [
@@ -50,13 +89,4 @@ function flysystem_requirements($phase) {
       ];
     }
   }
-
-  return $requirements;
-}
-
-/**
- * Implements hook_install().
- */
-function flysystem_install() {
-  Drupal::service('flysystem_factory')->ensure();
 }
