@@ -25,14 +25,22 @@ class FlysystemBridge extends FlysystemStreamWrapper implements StreamWrapperInt
    * {@inheritdoc}
    */
   public function getName() {
-    return $this->t('Flysystem: @scheme', ['@scheme' => $this->getProtocol()]);
+    $scheme = $this->getProtocol();
+    $name = (string) $this->getFactory()->getSettings($scheme)['name'];
+    $default = $this->t('Flysystem: @scheme', ['@scheme' => $scheme]);
+
+    return $name !== '' ? $this->t($name) : $default;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDescription() {
-    return $this->t('Flysystem: @scheme', ['@scheme' => $this->getProtocol()]);
+    $scheme = $this->getProtocol();
+    $description = (string) $this->getFactory()->getSettings($scheme)['description'];
+    $default = $this->t('Flysystem: @scheme', ['@scheme' => $scheme]);
+
+    return $description !== '' ? $this->t($description) : $default;
   }
 
   /**

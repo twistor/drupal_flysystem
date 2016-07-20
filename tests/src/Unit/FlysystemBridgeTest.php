@@ -43,6 +43,8 @@ class FlysystemBridgeTest extends UnitTestCase {
 
     $factory->getFilesystem('testscheme')->willReturn($this->filesystem);
 
+    $factory->getSettings('testscheme')->willReturn(['name' => '', 'description' => '']);
+
     $container = new ContainerBuilder();
     $container->set('flysystem_factory', $factory->reveal());
     \Drupal::setContainer($container);

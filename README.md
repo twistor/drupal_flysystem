@@ -73,6 +73,9 @@ $schemes = [
 
     // Optional settings that apply to all adapters.
 
+    'name' => 'Custom stream wrapper name', // Defaults to Flysystem: scheme.
+    'description' => 'Custom description',  // Defaults to Flysystem: scheme.
+
     'cache' => TRUE,             // Cache filesystem metadata. Not necessary for
                                  // the local driver.
 

@@ -29,6 +29,8 @@ class FlysystemFactory {
     'config' => [],
     'replicate' => FALSE,
     'cache' => FALSE,
+    'name' => '',
+    'description' => '',
   ];
 
   /**
@@ -149,6 +151,19 @@ class FlysystemFactory {
   }
 
   /**
+   * Finds the settings for a given scheme.
+   *
+   * @param string $scheme
+   *   The scheme.
+   *
+   * @return array
+   *   The settings array from settings.php.
+   */
+  public function getSettings($scheme) {
+    return isset($this->settings[$scheme]) ? $this->settings[$scheme] : $this->defaults;
+  }
+
+  /**
    * Calls FlysystemPluginInterface::ensure() on each plugin.
    *
    * @param bool $force
@@ -197,19 +212,6 @@ class FlysystemFactory {
     }
 
     return $adapter;
-  }
-
-  /**
-   * Finds the settings for a given scheme.
-   *
-   * @param string $scheme
-   *   The scheme.
-   *
-   * @return array
-   *   The settings array from settings.php.
-   */
-  protected function getSettings($scheme) {
-    return isset($this->settings[$scheme]) ? $this->settings[$scheme] : $this->defaults;
   }
 
 }
