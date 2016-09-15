@@ -9,11 +9,17 @@ php:
 matrix:
   fast_finish: true
 
+env:
+  - DRUPAL_BRANCH="8.1.x"
+  - DRUPAL_BRANCH="8.2.x"
+
 install:
   - composer self-update
   - cd ..
 
-  - git clone --depth 1 --branch 8.0.x https://git.drupal.org/project/drupal.git
+  - echo $DRUPAL_BRANCH
+
+  - git clone --depth 1 --branch $DRUPAL_BRANCH https://git.drupal.org/project/drupal.git
   - git clone --depth 1 --branch 8.x-1.x https://git.drupal.org/project/composer_manager.git
 
   - mv composer_manager drupal/modules/composer_manager
@@ -21,9 +27,11 @@ install:
 
   - cd drupal
 
+  - composer install
+
   - php modules/composer_manager/scripts/init.php
   - composer drupal-rebuild
-  - composer update --lock --prefer-source
+  - composer update --lock --prefer-dist
 
 script:
   - cd modules/flysystem
