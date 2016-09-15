@@ -5,6 +5,7 @@ namespace Drupal\Tests\flysystem\Unit;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
+use Drupal\flysystem\EditorFileReference;
 use Drupal\flysystem\FlysystemFactory;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -88,6 +89,20 @@ class ModuleFunctionsTest extends UnitTestCase {
    */
   public function testFlysystemFileDownloadIgnoresInvalidScheme() {
     $this->assertNull(flysystem_file_download('invalid://module_file/file.txt'));
+  }
+
+  /**
+   * Tests editor_file_reference class is replaced.
+   */
+  public function testFlysystemFilterInfoAlter() {
+    $info = [];
+
+    flysystem_filter_info_alter($info);
+    $this->assertEmpty($info);
+
+    $info['editor_file_reference'] = '';
+    flysystem_filter_info_alter($info);
+    $this->assertSame(EditorFileReference::class, $info['editor_file_reference']['class']);
   }
 
 }
