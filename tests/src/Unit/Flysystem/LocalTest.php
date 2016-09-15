@@ -52,8 +52,8 @@ class LocalTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::__construct()
-   * @covers ::create()
+   * @covers ::__construct
+   * @covers ::create
    */
   public function testCreateReturnsPlugin() {
     $container = new ContainerBuilder();
@@ -66,23 +66,23 @@ class LocalTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getAdapter()
-   * @covers ::ensureDirectory()
+   * @covers ::getAdapter
+   * @covers ::ensureDirectory
    */
   public function testReturnsLocalAdapter() {
     $this->assertInstanceOf(LocalAdapter::class, (new Local('foo/bar', FALSE))->getAdapter());
   }
 
   /**
-   * @covers ::getAdapter()
-   * @covers ::ensureDirectory()
+   * @covers ::getAdapter
+   * @covers ::ensureDirectory
    */
   public function testMissingAdapterReturnedWhenPathIsFile() {
     $this->assertInstanceOf(MissingAdapter::class, (new Local('test.txt'))->getAdapter());
   }
 
   /**
-   * @covers ::getExternalUrl()
+   * @covers ::getExternalUrl
    */
   public function testReturnsValidLocalUrl() {
     $plugin = new Local('foo/bar', FALSE);
@@ -90,7 +90,7 @@ class LocalTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getExternalUrl()
+   * @covers ::getExternalUrl
    */
   public function testReturnsValidExternalUrl() {
     $plugin = new Local('foo/bar', TRUE);
@@ -98,8 +98,8 @@ class LocalTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::ensure()
-   * @covers ::ensureDirectory()
+   * @covers ::ensure
+   * @covers ::ensureDirectory
    */
   public function testDirectoryIsAutoCreatedAndHtaccessIsWritten() {
     $plugin = new Local('does_not_exist');
@@ -109,8 +109,8 @@ class LocalTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::ensure()
-   * @covers ::writeHtaccess()
+   * @covers ::ensure
+   * @covers ::writeHtaccess
    */
   public function testHtaccessNotOverwritten() {
     file_put_contents('foo/bar/.htaccess', 'htcontent');
@@ -119,8 +119,8 @@ class LocalTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::ensure()
-   * @covers ::writeHtaccess()
+   * @covers ::ensure
+   * @covers ::writeHtaccess
    */
   public function testHtaccessNotOverwrittenAndFails() {
     mkdir('foo/bar/.htaccess', 0777, TRUE);
@@ -131,8 +131,8 @@ class LocalTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::ensure()
-   * @covers ::writeHtaccess()
+   * @covers ::ensure
+   * @covers ::writeHtaccess
    */
   public function testEnsureReturnsErrorWhenCantCreateDir() {
     $result = (new Local('test.txt'))->ensure();
