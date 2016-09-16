@@ -6,9 +6,9 @@ use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\File\FileSystemInterface as CoreFileSystemInterface;
 use Drupal\Core\Site\Settings;
-use Drupal\flysystem\Flysystem\Adapter\DrupalCacheAdapter;
 use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\FlysystemFactory;
+use Drupal\flysystem\Flysystem\Adapter\DrupalCacheAdapter;
 use Drupal\flysystem\Flysystem\Adapter\MissingAdapter;
 use Drupal\flysystem\Flysystem\Missing;
 use Drupal\flysystem\Plugin\FlysystemPluginInterface;
@@ -16,7 +16,7 @@ use League\Flysystem\Adapter\NullAdapter;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Replicate\ReplicateAdapter;
 use Prophecy\Argument;
-use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @coversDefaultClass \Drupal\flysystem\FlysystemFactory
@@ -30,14 +30,14 @@ class FlysystemFactoryTest extends UnitTestCase {
   protected $cache;
 
   /**
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
    * @var \Prophecy\Prophecy\ObjectProphecy
    */
   protected $filesystem;
-
-  /**
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
 
   /**
    * @var \Prophecy\Prophecy\ObjectProphecy
@@ -56,7 +56,7 @@ class FlysystemFactoryTest extends UnitTestCase {
     parent::setUp();
 
     $this->cache = new NullBackend('bin');
-    $this->logger = $this->getMock(LoggerInterface::class);
+    $this->eventDispatcher = $this->getMock(EventDispatcherInterface::class);
 
     $this->plugin_manager = $this->prophesize(PluginManagerInterface::class);
     $this->plugin = $this->prophesize(FlysystemPluginInterface::class);
@@ -183,7 +183,12 @@ class FlysystemFactoryTest extends UnitTestCase {
    * @return \Drupal\flysystem\FlysystemFactory
    */
   protected function getFactory() {
-    return new FlysystemFactory($this->plugin_manager->reveal(), $this->filesystem->reveal(), $this->cache, $this->logger);
+    return new FlysystemFactory(
+      $this->plugin_manager->reveal(),
+      $this->filesystem->reveal(),
+      $this->cache,
+      $this->eventDispatcher
+    );
   }
 
 }

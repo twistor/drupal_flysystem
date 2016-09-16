@@ -6,11 +6,13 @@ use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\flysystem\Event\EnsureEvent;
+use Drupal\flysystem\Event\FlysystemEvents;
 use Drupal\flysystem\Flysystem\Adapter\CacheItemBackend;
 use Drupal\flysystem\Flysystem\Adapter\DrupalCacheAdapter;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Replicate\ReplicateAdapter;
-use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * A factory for Flysystem filesystems.
@@ -41,18 +43,18 @@ class FlysystemFactory {
   protected $cacheBackend;
 
   /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
    * A cache of filesystems.
    *
    * @var \League\Flysystem\FilesystemInterface[]
    */
   protected $filesystems = [];
-
-  /**
-   * The logger to use.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
 
   /**
    * The Flysystem plugin manager.
@@ -84,13 +86,13 @@ class FlysystemFactory {
    *   The Drupal filesystem service.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   *   The event dispatcher.
    */
-  public function __construct(PluginManagerInterface $plugin_manager, FileSystemInterface $filesystem, CacheBackendInterface $cache, LoggerInterface $logger) {
+  public function __construct(PluginManagerInterface $plugin_manager, FileSystemInterface $filesystem, CacheBackendInterface $cache, EventDispatcherInterface $event_dispatcher) {
     $this->pluginManager = $plugin_manager;
     $this->cacheBackend = $cache;
-    $this->logger = $logger;
+    $this->eventDispatcher = $event_dispatcher;
 
     // Apply defaults and validate registered services.
     foreach (Settings::get('flysystem', []) as $scheme => $configuration) {
@@ -179,8 +181,16 @@ class FlysystemFactory {
 
       foreach ($this->getPlugin($scheme)->ensure($force) as $error) {
 
+        $event = new EnsureEvent(
+          $scheme,
+          $error['severity'],
+          $error['message'],
+          $error['context']
+        );
+
+        $this->eventDispatcher->dispatch(FlysystemEvents::ENSURE, $event);
+
         $errors[$scheme][] = $error;
-        $this->logger->log($error['severity'], $error['message'], $error['context']);
       }
     }
 

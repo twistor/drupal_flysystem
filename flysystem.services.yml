@@ -16,9 +16,15 @@ services:
 
   flysystem_factory:
     class: Drupal\flysystem\FlysystemFactory
-    arguments: ['@plugin.manager.flysystem', '@file_system', '@cache.flysystem', '@logger.channel.flysystem']
+    arguments: ['@plugin.manager.flysystem', '@file_system', '@cache.flysystem', '@event_dispatcher']
 
   path_processor.flysystem:
     class: Drupal\flysystem\PathProcessor\FlysystemPathProcessor
     tags:
       - { name: path_processor_inbound, priority: 400 }
+
+  flysystem.ensure_subscriber:
+    class: Drupal\flysystem\EventSubscriber\EnsureSubscriber
+    arguments: ['@logger.channel.flysystem']
+    tags:
+      - { name: event_subscriber }
