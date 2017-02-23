@@ -2,7 +2,7 @@
 
 namespace Drupal\flysystem\Form;
 
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\flysystem\FlysystemFactory;
@@ -198,7 +198,7 @@ class ConfigForm extends FormBase {
         \Drupal::logger('flysystem')->error($error[0], $error[1]);
       }
       else {
-        drupal_set_message(SafeMarkup::checkPlain($error), 'error', TRUE);
+        drupal_set_message(Html::escape($error), 'error', TRUE);
       }
     }
 
