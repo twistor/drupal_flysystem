@@ -1,6 +1,6 @@
 <?php
 
-namespace NoDrupal\Tests\flysystem\Unit\Plugin;
+namespace Drupal\Tests\flysystem\Unit\Plugin;
 
 use Drupal\Core\Routing\UrlGenerator;
 use Drupal\Tests\UnitTestCase;

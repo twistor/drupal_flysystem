@@ -1,6 +1,6 @@
 <?php
 
-namespace NoDrupal\Tests\flysystem\Unit\Flysystem;
+namespace Drupal\Tests\flysystem\Unit\Flysystem;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Routing\UrlGeneratorInterface;

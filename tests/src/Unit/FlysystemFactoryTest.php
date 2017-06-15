@@ -1,6 +1,6 @@
 <?php
 
-namespace NoDrupal\Tests\flysystem\Unit;
+namespace Drupal\Tests\flysystem\Unit;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Cache\NullBackend;

@@ -1,6 +1,6 @@
 <?php
 
-namespace NoDrupal\Tests\flysystem\Unit\Flysystem\Adapter;
+namespace Drupal\Tests\flysystem\Unit\Flysystem\Adapter;
 
 use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\Flysystem\Adapter\MissingAdapter;

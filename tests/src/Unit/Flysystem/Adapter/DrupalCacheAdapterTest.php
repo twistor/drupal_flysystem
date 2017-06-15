@@ -1,6 +1,6 @@
 <?php
 
-namespace NoDrupal\Tests\flysystem\Unit\Flysystem\Adapter;
+namespace Drupal\Tests\flysystem\Unit\Flysystem\Adapter;
 
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Tests\UnitTestCase;
