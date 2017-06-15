@@ -112,4 +112,11 @@ function ftp_systype() {
   return TRUE;
 }
 
+/**
+ * Stubs ftp_raw().
+ */
+function ftp_raw() {
+  return ['200'];
+}
+
 }
