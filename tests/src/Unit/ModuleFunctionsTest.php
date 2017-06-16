@@ -91,18 +91,4 @@ class ModuleFunctionsTest extends UnitTestCase {
     $this->assertNull(flysystem_file_download('invalid://module_file/file.txt'));
   }
 
-  /**
-   * Tests editor_file_reference class is replaced.
-   */
-  public function testFlysystemFilterInfoAlter() {
-    $info = [];
-
-    flysystem_filter_info_alter($info);
-    $this->assertEmpty($info);
-
-    $info['editor_file_reference'] = '';
-    flysystem_filter_info_alter($info);
-    $this->assertSame(EditorFileReference::class, $info['editor_file_reference']['class']);
-  }
-
 }
