@@ -92,6 +92,7 @@ class FlysystemRoutes implements ContainerInjectionInterface {
         '/' . $settings['config']['root'],
         [
           '_controller' => 'Drupal\system\FileDownloadController::download',
+          '_disable_route_normalizer' => TRUE,
           'scheme' => $scheme,
         ],
         [
@@ -105,6 +106,7 @@ class FlysystemRoutes implements ContainerInjectionInterface {
           '/' . $settings['config']['root'] . '/styles/{image_style}/' . $scheme,
           [
             '_controller' => 'Drupal\image\Controller\ImageStyleDownloadController::deliver',
+            '_disable_route_normalizer' => TRUE,
             'scheme' => $scheme,
           ],
           [
@@ -120,6 +122,7 @@ class FlysystemRoutes implements ContainerInjectionInterface {
         '/_flysystem/styles/{image_style}/{scheme}',
         [
           '_controller' => 'Drupal\image\Controller\ImageStyleDownloadController::deliver',
+          '_disable_route_normalizer' => TRUE,
         ],
         [
           '_access' => 'TRUE',
