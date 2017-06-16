@@ -10,9 +10,8 @@ matrix:
   fast_finish: true
 
 env:
-  - DRUPAL_BRANCH="8.1.x"
-  - DRUPAL_BRANCH="8.2.x"
   - DRUPAL_BRANCH="8.3.x"
+  - DRUPAL_BRANCH="8.4.x"
 
 install:
   - composer self-update
@@ -26,7 +25,7 @@ install:
 
   - cd drupal
 
-  - composer install
+  - composer install --prefer-dist
 
   - composer require league/flysystem league/flysystem-replicate-adapter league/flysystem-memory twistor/flysystem-stream-wrapper
 
