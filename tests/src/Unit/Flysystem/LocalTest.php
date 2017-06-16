@@ -114,7 +114,7 @@ class LocalTest extends UnitTestCase {
    */
   public function testHtaccessNotOverwritten() {
     file_put_contents('foo/bar/.htaccess', 'htcontent');
-    $this->assertSame([], (new Local('foo/bar'))->ensure());
+    $this->assertSame(1, count((new Local('foo/bar'))->ensure()));
     $this->assertSame('htcontent', file_get_contents('foo/bar/.htaccess'));
   }
 

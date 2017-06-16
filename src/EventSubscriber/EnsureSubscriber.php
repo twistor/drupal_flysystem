@@ -2,6 +2,7 @@
 
 namespace Drupal\flysystem\EventSubscriber;
 
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\flysystem\Event\EnsureEvent;
 use Drupal\flysystem\Event\FlysystemEvents;
 use Psr\Log\LoggerInterface;
@@ -45,6 +46,13 @@ class EnsureSubscriber implements EventSubscriberInterface {
    * Responds to FlysystemFactory::ensure().
    */
   public function onEnsure(EnsureEvent $event, $event_name, EventDispatcherInterface $dispatcher) {
+    // We only want to log failures, since this runs frequently.
+    switch ($event->getSeverity()) {
+      case RfcLogLevel::NOTICE:
+      case RfcLogLevel::INFO:
+        return;
+    }
+
     $this->logger->log(
       $event->getSeverity(),
       $event->getMessage(),

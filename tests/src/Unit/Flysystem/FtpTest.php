@@ -46,7 +46,7 @@ class FtpTest extends UnitTestCase {
    */
   public function testEnsureReturnsNoErrorsOnSuccess() {
     $plugin = new Ftp(['host' => 'success']);
-    $this->assertSame(0, count($plugin->ensure()));
+    $this->assertSame(1, count($plugin->ensure()));
   }
 
   /**

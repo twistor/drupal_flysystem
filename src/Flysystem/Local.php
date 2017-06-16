@@ -123,7 +123,11 @@ class Local implements FlysystemPluginInterface, ContainerFactoryPluginInterface
       ]];
     }
 
-    return [];
+    return [[
+      'severity' => RfcLogLevel::INFO,
+      'message' => 'The directory %root exists and is readable.',
+      'context' => ['%root' => $this->root],
+    ]];
   }
 
   /**
