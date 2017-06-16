@@ -2,15 +2,13 @@
 
 namespace Drupal\flysystem\Plugin;
 
-use Drupal\Core\Routing\UrlGeneratorTrait;
+use Drupal\Core\Url;
 use League\Flysystem\Util;
 
 /**
  * Helper trait for generating URLs from adapter plugins.
  */
 trait FlysystemUrlTrait {
-
-  use UrlGeneratorTrait;
 
   /**
    * Returns a web accessible URL for the resource.
@@ -34,7 +32,7 @@ trait FlysystemUrlTrait {
       'filepath' => $path,
     ];
 
-    return $this->url('flysystem.serve', $arguments, ['absolute' => TRUE]);
+    return Url::fromRoute('flysystem.serve', $arguments, ['absolute' => TRUE])->toString();
   }
 
   /**
