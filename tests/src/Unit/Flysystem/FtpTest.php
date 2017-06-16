@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\flysystem\Unit\Flysystem {
 
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Tests\UnitTestCase;
 use Drupal\flysystem\Flysystem\Adapter\MissingAdapter;
 use Drupal\flysystem\Flysystem\Ftp;
@@ -45,8 +46,10 @@ class FtpTest extends UnitTestCase {
    * @covers ::ensure
    */
   public function testEnsureReturnsNoErrorsOnSuccess() {
-    $plugin = new Ftp(['host' => 'success']);
-    $this->assertSame(1, count($plugin->ensure()));
+    $result = (new Ftp(['host' => 'success']))->ensure();
+
+    $this->assertSame(1, count($result));
+    $this->assertSame(RfcLogLevel::INFO, $result[0]['severity']);
   }
 
   /**

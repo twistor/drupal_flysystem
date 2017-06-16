@@ -3,6 +3,7 @@
 namespace Drupal\Tests\flysystem\Unit\Flysystem;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
@@ -114,7 +115,11 @@ class LocalTest extends UnitTestCase {
    */
   public function testHtaccessNotOverwritten() {
     file_put_contents('foo/bar/.htaccess', 'htcontent');
-    $this->assertSame(1, count((new Local('foo/bar'))->ensure()));
+
+    $result = (new Local('foo/bar'))->ensure();
+
+    $this->assertSame(1, count($result));
+    $this->assertSame(RfcLogLevel::INFO, $result[0]['severity']);
     $this->assertSame('htcontent', file_get_contents('foo/bar/.htaccess'));
   }
 
